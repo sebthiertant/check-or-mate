@@ -1,0 +1,82 @@
+name: Nightly ingestion
+
+on:
+  schedule:
+    - cron: "0 4 * * *"   # 04:00 UTC every day
+  workflow_dispatch:
+    inputs:
+      player:
+        description: "Chess.com username to fetch (leave blank for full watchlist)"
+        required: false
+      month:
+        description: "Month to fetch in YYYY-MM format (leave blank for latest)"
+        required: false
+
+concurrency:
+  group: ingest
+  cancel-in-progress: false   # never abort an in-flight ingestion
+
+permissions:
+  contents: write   # needed to commit games.db back to main
+
+jobs:
+  ingest:
+    name: Fetch game archives
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          python-version: "3.12"
+
+      - run: uv sync --package ingestion
+
+      - name: Fetch games
+        run: |
+          if [ -n "${{ inputs.player }}" ]; then
+            PLAYER_FLAG="--player ${{ inputs.player }}"
+          else
+            PLAYER_FLAG=""
+          fi
+          if [ -n "${{ inputs.month }}" ]; then
+            MONTH_FLAG="--month ${{ inputs.month }}"
+          else
+            MONTH_FLAG=""
+          fi
+          uv run python -m ingestion fetch $PLAYER_FLAG $MONTH_FLAG
+
+      - name: Commit updated database
+        run: |
+          git config user.name  "check-or-mate bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add data/games.db
+          git diff --staged --quiet || git commit -m "chore(data): nightly ingestion $(date -u +%Y-%m-%d)"
+          git push
+
+      - name: Trigger analysis
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.actions.createWorkflowDispatch({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              workflow_id: 'analyze.yml',
+              ref: 'main'
+            })
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              title: `Ingestion failed — ${new Date().toISOString().slice(0,10)}`,
+              labels: ['bug'],
+              body: `The nightly ingestion workflow failed. [See run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).`
+            })

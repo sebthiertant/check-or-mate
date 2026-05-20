@@ -1,0 +1,41 @@
+name: Feature request
+description: Suggest a new capability or improvement.
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Before submitting, check the [roadmap](https://github.com/sebthiertant/check-or-mate/projects/1) — it may already be planned.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the use-case or pain point.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Proposed solution
+      description: How do you imagine this working?
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: Other approaches you thought about and why you prefer this one.
+
+  - type: checkboxes
+    id: scope
+    attributes:
+      label: Which part of the system does this affect?
+      options:
+        - label: Ingestion (`packages/ingestion`)
+        - label: Analysis / scoring (`packages/analysis`)
+        - label: Front-end (`apps/web`)
+        - label: CI / GitHub Actions
+        - label: Documentation

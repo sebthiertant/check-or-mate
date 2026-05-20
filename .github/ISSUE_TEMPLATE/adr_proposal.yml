@@ -1,0 +1,46 @@
+name: ADR proposal
+description: Propose or challenge an architectural decision.
+labels: ["adr"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to propose a new Architecture Decision Record or to challenge an existing one.
+        Once the discussion converges, the author opens a PR with the `.md` file in `docs/adr/`.
+
+  - type: input
+    id: title
+    attributes:
+      label: Proposed ADR title
+      placeholder: "e.g. Switch from SQLite to Turso for edge reads"
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: What forces, constraints, or observations motivate this decision?
+    validations:
+      required: true
+
+  - type: textarea
+    id: options
+    attributes:
+      label: Options considered
+      description: At least two concrete alternatives with their trade-offs.
+    validations:
+      required: true
+
+  - type: textarea
+    id: preferred
+    attributes:
+      label: Preferred option and rationale
+    validations:
+      required: true
+
+  - type: input
+    id: existing_adr
+    attributes:
+      label: Supersedes (if applicable)
+      placeholder: "ADR-0002"

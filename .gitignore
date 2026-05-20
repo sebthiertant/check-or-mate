@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.venv/
+.uv/
+dist/
+*.egg-info/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+.next/
+out/
+.pnpm-store/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Stockfish cache
+~/.cache/check-or-mate/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/settings.json
+.idea/
+*.swp
+
+# Claude Code local config
+.claude/
+
+# Data — games.db est commité intentionnellement (voir ADR-0002)
+# mais les fichiers de travail locaux ne le sont pas
+data/*.db-shm
+data/*.db-wal
+data/scratch/

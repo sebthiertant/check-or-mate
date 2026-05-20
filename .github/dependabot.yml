@@ -1,0 +1,35 @@
+version: 2
+updates:
+  # JavaScript / pnpm workspace
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    groups:
+      react:
+        patterns: ["react*", "@types/react*"]
+      nextjs:
+        patterns: ["next", "@next/*"]
+      tailwind:
+        patterns: ["tailwind*", "postcss*", "autoprefixer"]
+
+  # Python packages (uv / pip)
+  - package-ecosystem: "pip"
+    directory: "/packages/ingestion"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+
+  - package-ecosystem: "pip"
+    directory: "/packages/analysis"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
