@@ -8,8 +8,7 @@
     "typecheck": "pnpm --filter web typecheck"
   },
   "engines": {
-    "node": ">=20",
-    "pnpm": ">=9"
+    "node": ">=20"
   },
   "packageManager": "pnpm@9.15.0"
 }
