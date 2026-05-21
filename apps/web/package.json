@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
-    "format:check": "prettier --check src/"
+    "format:check": "prettier --check src/",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "eslintConfig": {
     "extends": ["next/core-web-vitals"]
@@ -22,15 +24,21 @@
     "lucide-react": "^0.378.0"
   },
   "devDependencies": {
+    "@testing-library/jest-dom": "^6.6.0",
+    "@testing-library/react": "^16.0.0",
+    "@testing-library/user-event": "^14.5.0",
+    "@vitejs/plugin-react": "^4.3.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "jsdom": "^25.0.0",
     "typescript": "^5",
     "tailwindcss": "^3.4.4",
     "postcss": "^8",
     "autoprefixer": "^10",
     "prettier": "^3.3.0",
     "eslint": "^8",
-    "eslint-config-next": "14.2.21"
+    "eslint-config-next": "14.2.21",
+    "vitest": "^2.1.0"
   }
 }

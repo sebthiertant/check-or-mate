@@ -1,10 +1,14 @@
 interface HeaderProps {
   gameCount: number;
+  totalCount: number;
 }
 
-export function Header({ gameCount }: HeaderProps) {
+export function Header({ gameCount, totalCount }: HeaderProps) {
+  const gamesLabel =
+    gameCount < totalCount ? `${gameCount} / ${totalCount}` : gameCount;
+
   return (
-    <header className="mb-10">
+    <header className="mb-6">
       <div className="flex items-center gap-3 mb-3">
         <span className="text-2xl">♞</span>
         <h1 className="text-xl font-bold text-zinc-100 tracking-tight">
@@ -19,7 +23,7 @@ export function Header({ gameCount }: HeaderProps) {
         </span>
       </p>
       <div className="flex items-center gap-4 mt-4 pt-4 border-t border-zinc-800">
-        <Stat value={gameCount} label="games shown" />
+        <Stat value={gamesLabel} label="games shown" />
         <Divider />
         <Stat value="7" label="scoring dimensions" />
         <Divider />

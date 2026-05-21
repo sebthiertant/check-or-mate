@@ -70,10 +70,24 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm --filter web typecheck
 
+  ts-test:
+    name: TypeScript — vitest
+    runs-on: ubuntu-latest
+    needs: ts-lint
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter web test
+
   ts-build:
     name: Next.js build
     runs-on: ubuntu-latest
-    needs: ts-typecheck
+    needs: [ts-typecheck, ts-test]
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v5
