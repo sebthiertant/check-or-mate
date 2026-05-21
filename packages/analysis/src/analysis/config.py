@@ -13,6 +13,7 @@ _DEFAULT_CONFIG_PATH = Path(__file__).parent.parent.parent / "config.yml"
 class ScoringWeights:
     sacrifice: float
     eval_swing: float
+    brilliancy: float
     time_pressure: float
     endgame_quality: float
     rating_upset: float
@@ -45,6 +46,7 @@ def load_config(path: Path | None = None) -> ScoringConfig:
     weights = ScoringWeights(
         sacrifice=float(raw_weights["sacrifice"]),
         eval_swing=float(raw_weights["eval_swing"]),
+        brilliancy=float(raw_weights["brilliancy"]),
         time_pressure=float(raw_weights["time_pressure"]),
         endgame_quality=float(raw_weights["endgame_quality"]),
         rating_upset=float(raw_weights["rating_upset"]),

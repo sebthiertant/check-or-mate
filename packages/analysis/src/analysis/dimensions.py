@@ -6,7 +6,9 @@ import re
 import chess
 import chess.pgn
 
+from .brilliancy import brilliancy_score, eval_swing_score
 from .config import ScoringThresholds
+from .endgame import endgame_quality_score
 from .models import GameRecord, GameResult, PartialRawScores
 
 _PIECE_VALUES: dict[chess.PieceType, int] = {
@@ -20,31 +22,35 @@ _PIECE_VALUES: dict[chess.PieceType, int] = {
 _CLOCK_PATTERN: re.Pattern[str] = re.compile(r"\[%clk (\d+):(\d+):(\d+)\]")
 
 
-def compute_partial_scores(record: GameRecord, thresholds: ScoringThresholds) -> PartialRawScores:
-    """Compute five per-game heuristic dimensions.
+def compute_partial_scores(
+    record: GameRecord,
+    thresholds: ScoringThresholds,
+    evals: list[int] | None = None,
+) -> PartialRawScores:
+    """Compute per-game heuristic dimensions.
 
     opening_rarity is deferred to corpus level in the normaliser.
-    eval_swing is a placeholder (0) until M5 adds Stockfish evaluations.
+    Pass evals (cp from white's POV, one per half-move) to populate
+    eval_swing and brilliancy; omit for a Stockfish-free run (both → 0).
     """
     game = chess.pgn.read_game(io.StringIO(record.pgn))
     if game is None:
         return PartialRawScores(
             sacrifice=0.0,
             eval_swing=0.0,
+            brilliancy=0.0,
             time_pressure=0.0,
             endgame_quality=0.0,
             rating_upset=0.0,
         )
     return PartialRawScores(
         sacrifice=_sacrifice_score(game, record.result),
-        eval_swing=0.0,
+        eval_swing=eval_swing_score(evals) if evals is not None else 0.0,
+        brilliancy=brilliancy_score(evals) if evals is not None else 0.0,
         time_pressure=_time_pressure_score(game, thresholds.time_pressure_window_seconds),
-        endgame_quality=_endgame_quality_score(game, thresholds.endgame_piece_count, record.result),
+        endgame_quality=endgame_quality_score(game, thresholds.endgame_piece_count, record.result),
         rating_upset=_rating_upset_score(record),
     )
-
-
-# ── sacrifice ─────────────────────────────────────────────────────────────────
 
 
 def _sacrifice_score(game: chess.pgn.Game, result: GameResult) -> float:
@@ -90,9 +96,6 @@ def _black_sacrifice(balances: list[int], result: GameResult) -> float:
     return float(max_dip)
 
 
-# ── time pressure ─────────────────────────────────────────────────────────────
-
-
 def _time_pressure_score(game: chess.pgn.Game, threshold_seconds: int) -> float:
     """Count of moves played with fewer than threshold_seconds on the clock."""
     count = 0
@@ -114,40 +117,6 @@ def _parse_clock_seconds(comment: str) -> int | None:
     minutes = int(match.group(2))
     seconds = int(match.group(3))
     return hours * 3600 + minutes * 60 + seconds
-
-
-# ── endgame quality ───────────────────────────────────────────────────────────
-
-
-def _endgame_quality_score(
-    game: chess.pgn.Game, piece_count_threshold: int, result: GameResult
-) -> float:
-    """Fraction of moves played in endgame (≤ piece_count_threshold pieces)."""
-    board = game.board()
-    endgame_moves = 0
-    total_moves = 0
-    for move in game.mainline_moves():
-        board.push(move)
-        total_moves += 1
-        if _total_piece_count(board) <= piece_count_threshold:
-            endgame_moves += 1
-    if total_moves == 0 or endgame_moves == 0:
-        return 0.0
-    ratio = endgame_moves / total_moves
-    # Decisive endgame play scores slightly higher than drawn.
-    multiplier = 1.0 if result != GameResult.DRAW else 0.7
-    return ratio * multiplier * 100.0
-
-
-def _total_piece_count(board: chess.Board) -> int:
-    count = 0
-    for piece_type in chess.PIECE_TYPES:
-        count += len(board.pieces(piece_type, chess.WHITE))
-        count += len(board.pieces(piece_type, chess.BLACK))
-    return count
-
-
-# ── rating upset ──────────────────────────────────────────────────────────────
 
 
 def _rating_upset_score(record: GameRecord) -> float:

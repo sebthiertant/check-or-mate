@@ -8,6 +8,7 @@ from .models import NormalizedScores, PartialRawScores, RawScores
 _DIMENSIONS = (
     "sacrifice",
     "eval_swing",
+    "brilliancy",
     "time_pressure",
     "endgame_quality",
     "rating_upset",
@@ -33,6 +34,7 @@ def build_raw_scores(
             RawScores(
                 sacrifice=partial.sacrifice,
                 eval_swing=partial.eval_swing,
+                brilliancy=partial.brilliancy,
                 time_pressure=partial.time_pressure,
                 endgame_quality=partial.endgame_quality,
                 rating_upset=partial.rating_upset,
@@ -71,6 +73,7 @@ def _normalize_one(
     return NormalizedScores(
         sacrifice=normalized["sacrifice"],
         eval_swing=normalized["eval_swing"],
+        brilliancy=normalized["brilliancy"],
         time_pressure=normalized["time_pressure"],
         endgame_quality=normalized["endgame_quality"],
         rating_upset=normalized["rating_upset"],
@@ -80,7 +83,7 @@ def _normalize_one(
 
 
 def _clamp(value: float, min_val: float, max_val: float) -> int:
-    """Normalise a single value to [0, 100]. Returns 50 when all corpus values are equal."""
+    """Normalise a single value to [0, 100]. Returns 50 when all values are equal."""
     if max_val == min_val:
         return 50
     ratio = (value - min_val) / (max_val - min_val)
@@ -88,16 +91,18 @@ def _clamp(value: float, min_val: float, max_val: float) -> int:
 
 
 def _overall(normalized: dict[str, int], weights: ScoringWeights) -> int:
-    """Weighted average of the five active dimensions (eval_swing excluded until M5)."""
-    active = {
+    """Weighted average across all seven dimensions."""
+    dimension_weights = {
         "sacrifice": weights.sacrifice,
+        "eval_swing": weights.eval_swing,
+        "brilliancy": weights.brilliancy,
         "time_pressure": weights.time_pressure,
         "endgame_quality": weights.endgame_quality,
         "rating_upset": weights.rating_upset,
         "opening_rarity": weights.opening_rarity,
     }
-    total_weight = sum(active.values())
+    total_weight = sum(dimension_weights.values())
     if total_weight == 0:
         return 0
-    weighted_sum = sum(normalized[dim] * weight for dim, weight in active.items())
+    weighted_sum = sum(normalized[dim] * weight for dim, weight in dimension_weights.items())
     return round(weighted_sum / total_weight)

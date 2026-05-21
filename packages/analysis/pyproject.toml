@@ -21,3 +21,6 @@ dev = ["pytest>=8.0.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+markers = [
+    "integration: tests that require a real Stockfish binary (set STOCKFISH_PATH)",
+]

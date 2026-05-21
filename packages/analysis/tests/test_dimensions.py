@@ -40,7 +40,6 @@ def test_parse_clock_returns_none_for_empty_string() -> None:
 
 
 def test_white_sacrifice_returns_max_dip_when_white_wins() -> None:
-    # White gives a knight (-3) and recovers to 0.
     balances = [0, -3, -3, 0]
     assert _white_sacrifice(balances, GameResult.WHITE_WINS) == 3.0
 
@@ -56,7 +55,6 @@ def test_white_sacrifice_returns_zero_for_flat_balance() -> None:
 
 
 def test_black_sacrifice_returns_max_dip_when_black_wins() -> None:
-    # Black gives a rook (+5 to white), then wins back material.
     balances = [0, 5, 5, 1]
     assert _black_sacrifice(balances, GameResult.BLACK_WINS) == 5.0
 
@@ -76,7 +74,6 @@ def test_black_sacrifice_returns_zero_for_flat_balance() -> None:
 
 def test_sacrifice_is_nonzero_for_opera_game(opera_game_record: GameRecord) -> None:
     scores = compute_partial_scores(opera_game_record, _DEFAULT_THRESHOLDS)
-    # Morphy sacrifices both rooks — sacrifice should be > 0.
     assert scores.sacrifice > 0
 
 
@@ -85,12 +82,28 @@ def test_sacrifice_is_zero_for_equal_draw(equal_game_record: GameRecord) -> None
     assert scores.sacrifice == 0.0
 
 
-# ── compute_partial_scores — eval_swing ───────────────────────────────────────
+# ── compute_partial_scores — eval_swing and brilliancy ───────────────────────
 
 
-def test_eval_swing_is_zero_placeholder(equal_game_record: GameRecord) -> None:
+def test_eval_swing_is_zero_when_no_evals_provided(equal_game_record: GameRecord) -> None:
     scores = compute_partial_scores(equal_game_record, _DEFAULT_THRESHOLDS)
     assert scores.eval_swing == 0.0
+
+
+def test_brilliancy_is_zero_when_no_evals_provided(equal_game_record: GameRecord) -> None:
+    scores = compute_partial_scores(equal_game_record, _DEFAULT_THRESHOLDS)
+    assert scores.brilliancy == 0.0
+
+
+def test_eval_swing_uses_evals_when_provided(equal_game_record: GameRecord) -> None:
+    scores = compute_partial_scores(equal_game_record, _DEFAULT_THRESHOLDS, evals=[100, -50])
+    assert scores.eval_swing == 150.0  # max(|100-0|, |-50-100|) = 150
+
+
+def test_brilliancy_uses_evals_when_provided(equal_game_record: GameRecord) -> None:
+    # Eval jumps from 0 to 250 (white's first move → brilliant).
+    scores = compute_partial_scores(equal_game_record, _DEFAULT_THRESHOLDS, evals=[250])
+    assert scores.brilliancy == 1.0
 
 
 # ── compute_partial_scores — time pressure ────────────────────────────────────
@@ -98,7 +111,6 @@ def test_eval_swing_is_zero_placeholder(equal_game_record: GameRecord) -> None:
 
 def test_time_pressure_counts_moves_under_threshold(clocked_game_record: GameRecord) -> None:
     scores = compute_partial_scores(clocked_game_record, _DEFAULT_THRESHOLDS)
-    # Moves 1w (5s) and 1b (9s) are below 10s threshold; 2w (11s) and 2b (15s) are not.
     assert scores.time_pressure == 2.0
 
 
@@ -108,7 +120,6 @@ def test_time_pressure_is_zero_without_clock_annotations(equal_game_record: Game
 
 
 def test_time_pressure_threshold_is_exclusive(clocked_game_record: GameRecord) -> None:
-    # Raise threshold to 12s — now move 2w (11s) also qualifies.
     thresholds = ScoringThresholds(
         time_pressure_window_seconds=12,
         endgame_piece_count=6,
@@ -122,18 +133,15 @@ def test_time_pressure_threshold_is_exclusive(clocked_game_record: GameRecord) -
 
 
 def test_endgame_quality_is_zero_for_short_opening_game(equal_game_record: GameRecord) -> None:
-    # 3-move game stays in opening; no position has ≤ 6 pieces.
     scores = compute_partial_scores(equal_game_record, _DEFAULT_THRESHOLDS)
     assert scores.endgame_quality == 0.0
 
 
 def test_endgame_quality_is_zero_for_opera_game(opera_game_record: GameRecord) -> None:
-    # The Opera Game ends by middlegame checkmate; no position has ≤ 6 pieces.
     scores = compute_partial_scores(opera_game_record, _DEFAULT_THRESHOLDS)
     assert scores.endgame_quality == 0.0
 
 
-# PGN starting from a KQ vs K endgame position — all moves qualify (3 pieces ≤ 6).
 _PGN_KQ_VS_K = """\
 [Event "Endgame Test"]
 [White "A"]
@@ -164,13 +172,11 @@ def test_endgame_quality_is_nonzero_for_pure_endgame() -> None:
 
 
 def test_rating_upset_is_zero_when_favourite_wins(opera_game_record: GameRecord) -> None:
-    # Morphy (2700) beats 1500-rated opponent — not an upset.
     scores = compute_partial_scores(opera_game_record, _DEFAULT_THRESHOLDS)
     assert scores.rating_upset == 0.0
 
 
 def test_rating_upset_is_nonzero_when_underdog_wins(clocked_game_record: GameRecord) -> None:
-    # White (1800) beats Black (2100) → upset of 300.
     scores = compute_partial_scores(clocked_game_record, _DEFAULT_THRESHOLDS)
     assert scores.rating_upset == 300.0
 
@@ -202,6 +208,8 @@ def test_all_scores_are_zero_for_empty_pgn() -> None:
     )
     scores = compute_partial_scores(record, _DEFAULT_THRESHOLDS)
     assert scores.sacrifice == 0.0
+    assert scores.eval_swing == 0.0
+    assert scores.brilliancy == 0.0
     assert scores.time_pressure == 0.0
     assert scores.endgame_quality == 0.0
     assert scores.rating_upset == 0.0

@@ -1,12 +1,15 @@
 scoring:
-  # Weights for the overall score (eval_swing intentionally 0 until M5 Stockfish).
+  # Weights for the overall score.
+  # eval_swing and brilliancy require Stockfish (M5); without an Evaluator they
+  # default to 0 for every game and normalise to 50 (neutral).
   weights:
-    sacrifice: 0.25
-    eval_swing: 0.00
-    time_pressure: 0.20
-    endgame_quality: 0.20
-    rating_upset: 0.20
-    opening_rarity: 0.15
+    sacrifice: 0.20
+    eval_swing: 0.15
+    brilliancy: 0.15
+    time_pressure: 0.15
+    endgame_quality: 0.15
+    rating_upset: 0.10
+    opening_rarity: 0.10
 
   thresholds:
     time_pressure_window_s: 10   # moves with < 10s on the clock count as pressure

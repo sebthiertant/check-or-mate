@@ -4,8 +4,6 @@ from analysis.config import load_config
 from analysis.models import GameRecord, GameResult, NormalizedScores
 from analysis.scorer import Scorer
 
-# PGN constants duplicated here to avoid cross-package import issues when
-# running pytest from the repository root (namespace collision on `tests`).
 _PGN_EQUAL = """\
 [Event "Test"]
 [White "A"]
@@ -82,6 +80,7 @@ def test_score_corpus_all_dimensions_in_bounds() -> None:
         for dim in (
             "sacrifice",
             "eval_swing",
+            "brilliancy",
             "time_pressure",
             "endgame_quality",
             "rating_upset",
@@ -100,15 +99,17 @@ def test_score_corpus_returns_normalized_scores_instances() -> None:
     assert isinstance(scores[0], NormalizedScores)
 
 
-def test_score_corpus_eval_swing_is_zero_for_all_games() -> None:
+def test_score_corpus_engine_dimensions_normalize_to_50_without_evaluator() -> None:
     records = [
         _make_record("g1", _PGN_EQUAL, 2000, 2000, GameResult.DRAW, "C50"),
         _make_record("g2", _PGN_OPERA, 2700, 1500, GameResult.WHITE_WINS, "C41"),
     ]
     scores = Scorer(_CONFIG).score_corpus(records)
     for score in scores:
-        # eval_swing is a placeholder — all equal → normalised to 50.
+        # Without an Evaluator, eval_swing and brilliancy are 0 for every game
+        # → all equal → normalised to 50.
         assert score.eval_swing == 50
+        assert score.brilliancy == 50
 
 
 def test_score_corpus_sacrificial_game_scores_higher_sacrifice() -> None:
@@ -117,9 +118,7 @@ def test_score_corpus_sacrificial_game_scores_higher_sacrifice() -> None:
         _make_record("opera", _PGN_OPERA, 2700, 1500, GameResult.WHITE_WINS, "C41"),
     ]
     scores = Scorer(_CONFIG).score_corpus(records)
-    equal_sac = scores[0].sacrifice
-    opera_sac = scores[1].sacrifice
-    assert opera_sac > equal_sac
+    assert scores[1].sacrifice > scores[0].sacrifice
 
 
 def test_score_corpus_rarity_differs_for_distinct_ecos() -> None:
@@ -129,5 +128,4 @@ def test_score_corpus_rarity_differs_for_distinct_ecos() -> None:
         _make_record("g3", _PGN_OPERA, 2700, 1500, GameResult.WHITE_WINS, "C41"),
     ]
     scores = Scorer(_CONFIG).score_corpus(records)
-    # C50 appears twice (common), C41 once (rarer) → C41 should score higher.
     assert scores[2].opening_rarity > scores[0].opening_rarity

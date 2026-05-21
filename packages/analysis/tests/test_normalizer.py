@@ -7,6 +7,7 @@ from analysis.normalizer import _clamp, build_raw_scores, normalize_corpus
 _UNIFORM_WEIGHTS = ScoringWeights(
     sacrifice=0.25,
     eval_swing=0.0,
+    brilliancy=0.0,
     time_pressure=0.20,
     endgame_quality=0.20,
     rating_upset=0.20,
@@ -23,6 +24,7 @@ _CONFIG = ScoringConfig(weights=_UNIFORM_WEIGHTS, thresholds=_UNIFORM_THRESHOLDS
 def _raw(
     sacrifice: float = 0,
     eval_swing: float = 0,
+    brilliancy: float = 0,
     time_pressure: float = 0,
     endgame_quality: float = 0,
     rating_upset: float = 0,
@@ -31,6 +33,7 @@ def _raw(
     return RawScores(
         sacrifice=sacrifice,
         eval_swing=eval_swing,
+        brilliancy=brilliancy,
         time_pressure=time_pressure,
         endgame_quality=endgame_quality,
         rating_upset=rating_upset,
@@ -40,13 +43,16 @@ def _raw(
 
 def _partial(
     sacrifice: float = 0,
+    eval_swing: float = 0,
+    brilliancy: float = 0,
     time_pressure: float = 0,
     endgame_quality: float = 0,
     rating_upset: float = 0,
 ) -> PartialRawScores:
     return PartialRawScores(
         sacrifice=sacrifice,
-        eval_swing=0.0,
+        eval_swing=eval_swing,
+        brilliancy=brilliancy,
         time_pressure=time_pressure,
         endgame_quality=endgame_quality,
         rating_upset=rating_upset,
@@ -145,6 +151,7 @@ def test_normalize_corpus_all_dimensions_in_bounds() -> None:
         for dim in (
             "sacrifice",
             "eval_swing",
+            "brilliancy",
             "time_pressure",
             "endgame_quality",
             "rating_upset",

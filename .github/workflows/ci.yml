@@ -37,6 +37,11 @@ jobs:
           python-version: "3.12"
           enable-cache: true
           cache-dependency-glob: "uv.lock"
+      - name: Install Stockfish
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y stockfish
+          echo "STOCKFISH_PATH=$(command -v stockfish)" >> "$GITHUB_ENV"
       - run: uv sync --all-packages --frozen
       - run: uv run pytest packages/ingestion/ --tb=short -q
       - run: uv run pytest packages/analysis/ --tb=short -q

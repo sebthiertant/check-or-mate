@@ -27,7 +27,8 @@ class PartialRawScores:
     """Per-game raw scores — opening_rarity is deferred to corpus level."""
 
     sacrifice: float
-    eval_swing: float  # placeholder 0 until M5 Stockfish integration
+    eval_swing: float
+    brilliancy: float
     time_pressure: float
     endgame_quality: float
     rating_upset: float
@@ -35,10 +36,11 @@ class PartialRawScores:
 
 @dataclass(frozen=True)
 class RawScores:
-    """All six raw dimension scores, before corpus normalisation."""
+    """All seven raw dimension scores, before corpus normalisation."""
 
     sacrifice: float
     eval_swing: float
+    brilliancy: float
     time_pressure: float
     endgame_quality: float
     rating_upset: float
@@ -51,6 +53,7 @@ class NormalizedScores:
 
     sacrifice: int
     eval_swing: int
+    brilliancy: int
     time_pressure: int
     endgame_quality: int
     rating_upset: int
