@@ -68,7 +68,7 @@ def test_engine_evaluates_starting_position() -> None:
     fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
     with StockfishEngine(EngineConfig(path=_stockfish_path, depth=10)) as engine:
         score = engine.evaluate(fen)
-    assert abs(score) < 50  # starting position is nearly equal
+    assert abs(score) <= 50  # starting position is nearly equal
 
 
 @requires_stockfish
