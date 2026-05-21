@@ -7,7 +7,10 @@ import {
   serializeFilters,
   sortGames,
 } from "@/lib/filters";
-import { FIXTURES } from "@/lib/fixtures";
+import type { Game } from "@/lib/types";
+import gamesJson from "../../data/scores.json";
+
+const FIXTURES = gamesJson as unknown as Game[];
 
 // ── parseFilters ──────────────────────────────────────────────────────────────
 

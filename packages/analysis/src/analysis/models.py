@@ -20,6 +20,12 @@ class GameRecord:
     black_rating: int
     result: GameResult
     eco: str
+    # Display fields — populated from DB; default to "" / 0 for test ergonomics
+    white: str = ""
+    black: str = ""
+    time_class: str = ""
+    end_time: int = 0
+    opening_name: str = ""
 
 
 @dataclass(frozen=True)

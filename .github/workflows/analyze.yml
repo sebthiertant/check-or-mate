@@ -36,13 +36,13 @@ jobs:
         run: |
           uv run analysis score \
             --engine-path "$STOCKFISH_PATH" \
-            --output data/scores.json
+            --output apps/web/data/scores.json
 
       - name: Commit scored results
         run: |
           git config user.name  "check-or-mate bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/scores.json
+          git add apps/web/data/scores.json
           git diff --staged --quiet || git commit -m "chore(data): analysis scores $(date -u +%Y-%m-%dT%H:%M)"
           git push
 

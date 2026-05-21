@@ -1,12 +1,15 @@
 import { Suspense } from "react";
+
+import { loadGames } from "@/lib/loadGames";
 import { FilteredPage } from "@/components/FilteredPage";
 
 export default function HomePage() {
+  const games = loadGames();
   return (
     <main className="min-h-screen bg-zinc-950">
       <div className="max-w-3xl mx-auto px-4 py-12">
         <Suspense>
-          <FilteredPage />
+          <FilteredPage games={games} />
         </Suspense>
         <footer className="mt-16 pt-8 border-t border-zinc-900 text-center">
           <p className="text-zinc-700 text-xs">

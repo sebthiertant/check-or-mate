@@ -23,6 +23,7 @@ export interface Game {
   opening_name: string;
   time_class: TimeClass;
   date: string;
+  pgn?: string;
   scores: Scores;
 }
 

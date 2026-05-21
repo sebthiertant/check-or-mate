@@ -1,20 +1,16 @@
-"""CLI: python -m analysis score --since YYYY-MM-DD --db data/games.db"""
+"""CLI: analysis score --since YYYY-MM-DD --db data/games.db"""
 
 import argparse
 import dataclasses
-import io
 import json
-import sqlite3
-from datetime import UTC, datetime
 from pathlib import Path
 
-import chess.pgn
-
+from . import db
 from .cache import EvalCache
 from .config import load_config
 from .engine import EngineConfig
 from .evaluator import Evaluator
-from .models import GameRecord, GameResult, NormalizedScores
+from .models import GameRecord, NormalizedScores
 from .scorer import Scorer
 
 
@@ -91,9 +87,26 @@ def _write_json(
     output_path: Path, records: list[GameRecord], scores: list[NormalizedScores]
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    data = [{"game_id": r.game_id, **dataclasses.asdict(s)} for r, s in zip(records, scores)]
+    data = [_to_game_dict(r, s) for r, s in zip(records, scores)]
     output_path.write_text(json.dumps(data, indent=2))
     print(f"Scores written to {output_path}.")
+
+
+def _to_game_dict(record: GameRecord, scores: NormalizedScores) -> dict[str, object]:
+    return {
+        "id": record.game_id,
+        "white": record.white,
+        "black": record.black,
+        "white_rating": record.white_rating,
+        "black_rating": record.black_rating,
+        "result": record.result.value,
+        "eco": record.eco,
+        "opening_name": record.opening_name,
+        "time_class": record.time_class,
+        "date": db.unix_to_date(record.end_time),
+        "pgn": record.pgn,
+        "scores": dataclasses.asdict(scores),
+    }
 
 
 def _print_header() -> None:
@@ -105,45 +118,4 @@ def _print_header() -> None:
 
 
 def _load_game_records(db_path: Path, since: str) -> list[GameRecord]:
-    since_timestamp = _iso_date_to_unix(since)
-    connection = sqlite3.connect(db_path)
-    rows = connection.execute(
-        "SELECT game_id, pgn, white_rating, black_rating FROM games WHERE end_time >= ?",
-        (since_timestamp,),
-    ).fetchall()
-    connection.close()
-
-    records = []
-    for game_id, pgn, white_rating, black_rating in rows:
-        record = _build_game_record(game_id, pgn, white_rating, black_rating)
-        if record is not None:
-            records.append(record)
-    return records
-
-
-def _build_game_record(
-    game_id: str, pgn: str, white_rating: int, black_rating: int
-) -> GameRecord | None:
-    game = chess.pgn.read_game(io.StringIO(pgn))
-    if game is None:
-        return None
-    result_str = game.headers.get("Result", "")
-    try:
-        result = GameResult(result_str)
-    except ValueError:
-        return None
-    eco = game.headers.get("ECO", "")
-    return GameRecord(
-        game_id=game_id,
-        pgn=pgn,
-        white_rating=white_rating,
-        black_rating=black_rating,
-        result=result,
-        eco=eco,
-    )
-
-
-def _iso_date_to_unix(date_string: str) -> int:
-    """Convert an ISO date string (YYYY-MM-DD) to a UTC Unix timestamp."""
-    year, month, day = (int(part) for part in date_string.split("-"))
-    return int(datetime(year, month, day, tzinfo=UTC).timestamp())
+    return db.load_game_records(db_path, db.iso_date_to_unix(since))

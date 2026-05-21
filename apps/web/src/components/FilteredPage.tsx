@@ -2,7 +2,8 @@
 
 import { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { FIXTURES } from "@/lib/fixtures";
+
+import type { Game } from "@/lib/types";
 import {
   DEFAULT_FILTERS,
   filterGames,
@@ -16,7 +17,11 @@ import { FilterPanel } from "./FilterPanel";
 import { GameList } from "./GameList";
 import { Header } from "./Header";
 
-export function FilteredPage() {
+interface FilteredPageProps {
+  games: Game[];
+}
+
+export function FilteredPage({ games }: FilteredPageProps) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -39,12 +44,12 @@ export function FilteredPage() {
     [updateFilters],
   );
 
-  const filteredGames = filterGames(FIXTURES, filters);
+  const filteredGames = filterGames(games, filters);
   const sortedGames = sortGames(filteredGames, filters.sort);
 
   return (
     <>
-      <Header gameCount={sortedGames.length} totalCount={FIXTURES.length} />
+      <Header gameCount={sortedGames.length} totalCount={games.length} />
       <FilterPanel
         filters={filters}
         onUpdate={updateFilters}

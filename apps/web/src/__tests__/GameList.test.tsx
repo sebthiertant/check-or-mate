@@ -2,7 +2,10 @@ import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { GameList } from "@/components/GameList";
-import { FIXTURES } from "@/lib/fixtures";
+import type { Game } from "@/lib/types";
+import gamesJson from "../../data/scores.json";
+
+const FIXTURES = gamesJson as unknown as Game[];
 
 const noop = vi.fn();
 
