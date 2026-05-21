@@ -38,8 +38,7 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
       - run: uv sync --all-packages --frozen
-      - run: uv run pytest packages/ --tb=short -q --ignore=packages/ingestion --ignore=packages/analysis || true
-        # ↑ passes until M2/M3 tests are written; remove `|| true` then
+      - run: uv run pytest packages/ --tb=short -q --ignore=packages/analysis
 
   # ── TypeScript ────────────────────────────────────────────────────────────
   ts-lint:
