@@ -1,0 +1,14 @@
+scoring:
+  # Weights for the overall score (eval_swing intentionally 0 until M5 Stockfish).
+  weights:
+    sacrifice: 0.25
+    eval_swing: 0.00
+    time_pressure: 0.20
+    endgame_quality: 0.20
+    rating_upset: 0.20
+    opening_rarity: 0.15
+
+  thresholds:
+    time_pressure_window_s: 10   # moves with < 10s on the clock count as pressure
+    endgame_piece_count: 6       # positions with ≤ 6 pieces total = endgame
+    rating_upset_max_delta: 300  # 300 Elo upset → raw score capped at this value

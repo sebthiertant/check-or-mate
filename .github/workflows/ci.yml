@@ -38,7 +38,8 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
       - run: uv sync --all-packages --frozen
-      - run: uv run pytest packages/ --tb=short -q --ignore=packages/analysis
+      - run: uv run pytest packages/ingestion/ --tb=short -q
+      - run: uv run pytest packages/analysis/ --tb=short -q
 
   # ── TypeScript ────────────────────────────────────────────────────────────
   ts-lint:
