@@ -10,8 +10,9 @@ class PlayerResult(BaseModel):
 
 
 class RawGame(BaseModel):
+    model_config = ConfigDict(extra="ignore")
     url: str
-    pgn: str
+    pgn: str | None = None  # absent for forfeited / abandoned games
     time_control: str
     end_time: int
     rated: bool

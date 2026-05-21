@@ -14,7 +14,8 @@ concurrency:
   cancel-in-progress: false   # never abort an in-flight ingestion
 
 permissions:
-  contents: write   # needed to commit games.db back to main
+  contents: write   # commit games.db and watchlist.yml
+  issues: write     # open issue on failure
 
 jobs:
   ingest:

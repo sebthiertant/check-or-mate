@@ -9,7 +9,8 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: write
+  contents: write   # commit scores.json
+  issues: write     # open issue on failure
 
 jobs:
   analyze:

@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 from ingestion.models import ArchiveList, GamesArchive, PlayerResult, RawGame
 from ingestion.store import Store
-from ingestion.sync import Syncer, _parse_archive_url
+from ingestion.sync import Syncer, _parse_archive_url, _save_games_with_pgn
 
 _ARCHIVE_URL = "https://api.chess.com/pub/player/hikaru/games/2024/01"
 
@@ -102,6 +102,25 @@ def test_sync_player_accumulates_multiple_archives() -> None:
     count = syncer.sync_player("hikaru")
 
     assert count == 3
+
+
+def test_save_games_with_pgn_skips_pgn_less_games() -> None:
+    game_with_pgn = _raw_game("100")
+    game_without_pgn = RawGame(
+        url="https://www.chess.com/game/live/101",
+        pgn=None,
+        time_control="180",
+        end_time=1705000001,
+        rated=True,
+        time_class="blitz",
+        white=PlayerResult(username="alpha", rating=2700, result="win"),
+        black=PlayerResult(username="beta", rating=2690, result="resigned"),
+    )
+    store = _in_memory_store()
+
+    saved = _save_games_with_pgn(store, [game_with_pgn, game_without_pgn])
+
+    assert saved == 1
 
 
 def test_sync_player_marks_archive_as_synced() -> None:
