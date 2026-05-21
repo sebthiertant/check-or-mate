@@ -43,3 +43,4 @@ Thumbs.db
 data/*.db-shm
 data/*.db-wal
 data/scratch/
+apps/web/tsconfig.tsbuildinfo
