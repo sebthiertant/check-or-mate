@@ -8,11 +8,12 @@ from ingestion.watchlist import load_players, populate
 
 _LEADERBOARD_URL = "https://api.chess.com/pub/leaderboards"
 
-_ENTRY = lambda rank, username: {"rank": rank, "username": username, "player_id": rank, "url": ""}  # noqa: E731
+def _entry(rank: int, username: str) -> dict[str, object]:
+    return {"rank": rank, "username": username, "player_id": rank, "url": ""}
 
 
 def _make_leaderboard_client(blitz: list[str]) -> ChessComClient:
-    entries = [_ENTRY(i + 1, name) for i, name in enumerate(blitz)]
+    entries = [_entry(i + 1, name) for i, name in enumerate(blitz)]
     payload = {
         "live_blitz": entries,
         "live_bullet": [],
