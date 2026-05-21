@@ -15,7 +15,7 @@ class EngineConfig:
     """Stockfish engine configuration."""
 
     path: str
-    depth: int = 18
+    depth: int = 10
 
 
 class StockfishEngine:

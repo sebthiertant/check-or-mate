@@ -36,6 +36,16 @@ jobs:
           restore-keys: |
             games-db-
 
+      # Le cache des évaluations Stockfish (FEN → centipawns) évite de réévaluer
+      # les positions d'ouverture communes à chaque run.
+      - name: Restore eval cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/eval_cache
+          key: eval-cache-${{ github.run_id }}
+          restore-keys: |
+            eval-cache-
+
       - name: Install Stockfish
         run: |
           sudo apt-get update -qq
@@ -48,7 +58,16 @@ jobs:
         run: |
           uv run analysis score \
             --engine-path "$STOCKFISH_PATH" \
+            --since "$(date -u -d '7 days ago' +%Y-%m-%d)" \
+            --top-n 100 \
             --output apps/web/data/scores.json
+
+      - name: Save eval cache
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: data/eval_cache
+          key: eval-cache-${{ github.run_id }}
 
       - name: Commit scored results
         run: |

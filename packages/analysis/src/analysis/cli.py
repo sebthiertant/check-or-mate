@@ -22,6 +22,7 @@ def main() -> None:
         config_path=Path(args.config) if args.config else None,
         engine_path=args.engine_path,
         output_path=Path(args.output) if args.output else None,
+        top_n=args.top_n,
     )
 
 
@@ -40,6 +41,9 @@ def _build_argument_parser() -> argparse.ArgumentParser:
     score_cmd.add_argument("--config", default=None, help="Path to an alternative config.yml")
     score_cmd.add_argument("--engine-path", default=None, help="Path to Stockfish binary")
     score_cmd.add_argument("--output", default=None, help="Write JSON scores to this file")
+    score_cmd.add_argument(
+        "--top-n", type=int, default=None, help="Keep only the N highest-scoring games"
+    )
     return parser
 
 
@@ -49,6 +53,7 @@ def _run_score(
     config_path: Path | None = None,
     engine_path: str | None = None,
     output_path: Path | None = None,
+    top_n: int | None = None,
 ) -> None:
     config = load_config(config_path)
     records = _load_game_records(db_path, since)
@@ -61,8 +66,12 @@ def _run_score(
     scorer = Scorer(config, evaluator)
     scores = scorer.score_corpus(records)
 
+    paired = sorted(zip(records, scores), key=lambda p: p[1].overall, reverse=True)
+    if top_n is not None:
+        paired = paired[:top_n]
+
     _print_header()
-    for record, normalized in zip(records, scores):
+    for record, normalized in paired:
         print(
             f"{record.game_id:<40s}  "
             f"overall={normalized.overall:3d}  "
@@ -72,9 +81,9 @@ def _run_score(
             f"ru={normalized.rating_upset:3d}  "
             f"or={normalized.opening_rarity:3d}"
         )
-    print(f"\n{len(records)} game(s) scored.")
+    print(f"\n{len(paired)} game(s) written ({len(records)} scored).")
     if output_path:
-        _write_json(output_path, records, scores)
+        _write_json(output_path, [r for r, _ in paired], [s for _, s in paired])
 
 
 def _build_evaluator(engine_path: str) -> Evaluator:
