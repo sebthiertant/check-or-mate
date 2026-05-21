@@ -9,17 +9,13 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-# Opt into Node.js 24 now to avoid the Node.js 20 deprecation warnings
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-
 jobs:
   # ── Python ────────────────────────────────────────────────────────────────
   python-lint:
     name: Python — ruff + mypy
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
@@ -35,7 +31,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: python-lint
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.12"
@@ -50,10 +46,8 @@ jobs:
     name: TypeScript — ESLint + Prettier
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -67,10 +61,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: ts-lint
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -83,10 +75,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: ts-typecheck
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 9
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v5
       - uses: actions/setup-node@v4
         with:
           node-version: 22
