@@ -39,6 +39,15 @@ def test_list_archives_returns_archive_list() -> None:
     assert result.archives == [_GAMES_URL]
 
 
+def test_list_archives_returns_empty_on_404() -> None:
+    client = _make_client({})
+
+    result = client.list_archives("unknown_player")
+
+    assert isinstance(result, ArchiveList)
+    assert result.archives == []
+
+
 def test_fetch_games_returns_games_archive() -> None:
     client = _make_client({_GAMES_URL: {"games": [_SAMPLE_GAME]}})
 
@@ -59,8 +68,20 @@ def test_fetch_games_pads_month_with_zero() -> None:
     assert isinstance(result, GamesArchive)
 
 
-def test_fetch_games_raises_on_http_error() -> None:
+def test_fetch_games_returns_empty_on_404() -> None:
     client = _make_client({})
 
+    result = client.fetch_games("duhless", 2026, 5)
+
+    assert isinstance(result, GamesArchive)
+    assert result.games == []
+
+
+def test_fetch_games_raises_on_5xx_error() -> None:
+    def handler(request: httpx.Request) -> httpx.Response:
+        return httpx.Response(500)
+
+    client = ChessComClient(httpx.Client(transport=httpx.MockTransport(handler)))
+
     with pytest.raises(httpx.HTTPStatusError):
-        client.fetch_games("nobody", 2024, 1)
+        client.fetch_games("hikaru", 2024, 1)

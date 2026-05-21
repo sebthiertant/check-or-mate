@@ -13,14 +13,24 @@ class ChessComClient:
         self._http = http_client or httpx.Client(headers=_DEFAULT_HEADERS, timeout=30.0)
 
     def list_archives(self, player: str) -> ArchiveList:
-        """Return the list of monthly archive URLs for a player."""
+        """Return the list of monthly archive URLs for a player.
+
+        Returns an empty list for unknown or deactivated accounts (404).
+        """
         response = self._http.get(f"{_BASE_URL}/player/{player}/games/archives")
+        if response.status_code == 404:
+            return ArchiveList(archives=[])
         response.raise_for_status()
         return ArchiveList.model_validate(response.json())
 
     def fetch_games(self, player: str, year: int, month: int) -> GamesArchive:
-        """Fetch all games for a player in the given year/month."""
+        """Fetch all games for a player in the given year/month.
+
+        Returns an empty archive for months with no games or not yet available (404).
+        """
         response = self._http.get(f"{_BASE_URL}/player/{player}/games/{year}/{month:02d}")
+        if response.status_code == 404:
+            return GamesArchive(games=[])
         response.raise_for_status()
         return GamesArchive.model_validate(response.json())
 
