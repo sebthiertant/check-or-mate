@@ -47,9 +47,8 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 # Serveur standalone Next.js (monorepo → apps/web/server.js)
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 
-# Assets statiques et dossier public
+# Assets statiques (pas de dossier public/ dans ce projet)
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
-COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public       ./apps/web/public
 
 # scores.json : loadGames() lit process.cwd()/data/scores.json
 # CWD au runtime = /app (WORKDIR), donc on place le fichier dans /app/data/
