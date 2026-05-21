@@ -18,13 +18,32 @@ const PGN = `[Event "Test"]
 1. e4 e5 2. Nf3 Nc6 1/2-1/2`;
 
 describe("BoardViewer — PGN vide", () => {
-  it("affiche uniquement le lien Chess.com", () => {
+  it("affiche quand même l'échiquier en position initiale", () => {
     render(<BoardViewer pgn="" gameId="test-123" />);
+    expect(screen.getByTestId("chessboard")).toBeInTheDocument();
+  });
+
+  it("affiche le message données de démo", () => {
+    render(<BoardViewer pgn="" gameId="test-123" />);
+    expect(screen.getByText(/données de démo/i)).toBeInTheDocument();
+  });
+
+  it("n'affiche pas les boutons de navigation", () => {
+    render(<BoardViewer pgn="" gameId="test-123" />);
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+  });
+
+  it("lien vers chess.com pour un ID fictif", () => {
+    render(<BoardViewer pgn="" gameId="nakamura-carlsen-2026-01" />);
+    expect(screen.getByRole("link")).toHaveAttribute("href", "https://www.chess.com");
+  });
+
+  it("lien vers la partie pour un ID numérique", () => {
+    render(<BoardViewer pgn="" gameId="96543210" />);
     expect(screen.getByRole("link")).toHaveAttribute(
       "href",
-      "https://www.chess.com/game/live/test-123",
+      "https://www.chess.com/game/live/96543210",
     );
-    expect(screen.queryByTestId("chessboard")).not.toBeInTheDocument();
   });
 });
 
@@ -65,11 +84,11 @@ describe("BoardViewer — avec PGN", () => {
     expect(screen.getByText(/position initiale/i)).toBeInTheDocument();
   });
 
-  it("inclut le lien Chess.com avec le bon gameId", () => {
-    render(<BoardViewer pgn={PGN} gameId="abc123" />);
+  it("inclut le lien Chess.com avec ID numérique", () => {
+    render(<BoardViewer pgn={PGN} gameId="96543210" />);
     expect(screen.getByRole("link", { name: /chess\.com/i })).toHaveAttribute(
       "href",
-      "https://www.chess.com/game/live/abc123",
+      "https://www.chess.com/game/live/96543210",
     );
   });
 });
