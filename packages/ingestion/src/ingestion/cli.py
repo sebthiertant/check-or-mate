@@ -3,10 +3,10 @@
 import argparse
 from pathlib import Path
 
+from . import watchlist
 from .client import ChessComClient
 from .store import Store
 from .sync import Syncer
-from . import watchlist
 
 
 def main() -> None:

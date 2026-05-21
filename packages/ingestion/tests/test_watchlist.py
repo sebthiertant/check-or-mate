@@ -1,9 +1,8 @@
 """Tests for the watchlist module."""
 
-import httpx
-import pytest
 from pathlib import Path
 
+import httpx
 from ingestion.client import ChessComClient
 from ingestion.watchlist import load_players, populate
 
