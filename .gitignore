@@ -38,8 +38,9 @@ Thumbs.db
 # Claude Code local config
 .claude/
 
-# Data — games.db est commité intentionnellement (voir ADR-0002)
-# mais les fichiers de travail locaux ne le sont pas
+# Data — games.db est stocké dans le GitHub Actions Cache (trop grand pour git)
+# Seul data/watchlist.yml et apps/web/data/scores.json sont versionnés
+data/games.db
 data/*.db-shm
 data/*.db-wal
 data/scratch/

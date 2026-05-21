@@ -25,6 +25,17 @@ jobs:
         with:
           python-version: "3.12"
 
+      # Restaure games.db depuis le dernier cache disponible (sauvé par ingest.yml).
+      # Si aucun cache n'existe, l'étape "Score games" s'arrêtera proprement
+      # avec le message "No games found".
+      - name: Restore games.db from cache
+        uses: actions/cache/restore@v4
+        with:
+          path: data/games.db
+          key: games-db-${{ github.run_id }}
+          restore-keys: |
+            games-db-
+
       - name: Install Stockfish
         run: |
           sudo apt-get update -qq
