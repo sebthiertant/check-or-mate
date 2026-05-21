@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import type { Game } from "@/lib/types";
@@ -16,6 +16,7 @@ import {
 import { FilterPanel } from "./FilterPanel";
 import { GameList } from "./GameList";
 import { Header } from "./Header";
+import { getTopPlayers } from "@/lib/topPlayers";
 
 const PAGE_SIZE = 20;
 
@@ -28,6 +29,7 @@ export function FilteredPage({ games }: FilteredPageProps) {
   const router = useRouter();
   const pathname = usePathname();
   const [page, setPage] = useState(1);
+  const topPlayers = useMemo(() => getTopPlayers(games, 15), [games]);
 
   const filters = parseFilters(new URLSearchParams(searchParams.toString()));
   const active = hasActiveFilters(filters);
@@ -62,6 +64,7 @@ export function FilteredPage({ games }: FilteredPageProps) {
         onUpdate={updateFilters}
         onReset={resetFilters}
         hasActive={active}
+        topPlayers={topPlayers}
       />
       <GameList games={pagedGames} onReset={resetFilters} rankOffset={pageStart} />
       {totalPages > 1 && (

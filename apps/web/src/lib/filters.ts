@@ -11,6 +11,7 @@ export interface Filters {
   rating_upset: number;
   opening_rarity: number;
   sort: SortKey;
+  players: string[];
 }
 
 export const SCORE_DIMENSIONS = [
@@ -37,6 +38,7 @@ export const DEFAULT_FILTERS: Filters = {
   rating_upset: 0,
   opening_rarity: 0,
   sort: "overall",
+  players: [],
 };
 
 /** Parse URL search params into a Filters object, ignoring invalid values. */
@@ -57,6 +59,11 @@ export function parseFilters(params: URLSearchParams): Filters {
     filters.sort = rawSort as SortKey;
   }
 
+  const rawPlayers = params.get("players");
+  if (rawPlayers) {
+    filters.players = rawPlayers.split(",").filter(Boolean);
+  }
+
   return filters;
 }
 
@@ -69,15 +76,23 @@ export function serializeFilters(filters: Filters): string {
   }
 
   if (filters.sort !== "overall") params.set("sort", filters.sort);
+  if (filters.players.length > 0) params.set("players", filters.players.join(","));
 
   return params.toString();
 }
 
 /** Return games where every active threshold is satisfied. */
 export function filterGames(games: Game[], filters: Filters): Game[] {
-  return games.filter((game) =>
-    SCORE_DIMENSIONS.every((dim) => game.scores[dim] >= filters[dim]),
-  );
+  return games.filter((game) => {
+    if (filters.players.length > 0) {
+      const wl = game.white.toLowerCase();
+      const bl = game.black.toLowerCase();
+      if (!filters.players.some((p) => p.toLowerCase() === wl || p.toLowerCase() === bl)) {
+        return false;
+      }
+    }
+    return SCORE_DIMENSIONS.every((dim) => game.scores[dim] >= filters[dim]);
+  });
 }
 
 /** Return a new sorted copy of games (descending by sortKey). */
@@ -85,10 +100,11 @@ export function sortGames(games: Game[], sortKey: SortKey): Game[] {
   return [...games].sort((a, b) => b.scores[sortKey] - a.scores[sortKey]);
 }
 
-/** True when any threshold is non-zero or sort is not the default. */
+/** True when any threshold is non-zero, sort is not the default, or players are selected. */
 export function hasActiveFilters(filters: Filters): boolean {
   return (
     SCORE_DIMENSIONS.some((dim) => filters[dim] > 0) ||
-    filters.sort !== "overall"
+    filters.sort !== "overall" ||
+    filters.players.length > 0
   );
 }

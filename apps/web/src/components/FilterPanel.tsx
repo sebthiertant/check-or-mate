@@ -10,12 +10,15 @@ import {
   type Filters,
   type SortKey,
 } from "@/lib/filters";
+import type { PlayerEntry } from "@/lib/topPlayers";
+import { PlayerPicker } from "./PlayerPicker";
 
 interface FilterPanelProps {
   filters: Filters;
   onUpdate: (updates: Partial<Filters>) => void;
   onReset: () => void;
   hasActive: boolean;
+  topPlayers?: PlayerEntry[];
 }
 
 export function FilterPanel({
@@ -23,6 +26,7 @@ export function FilterPanel({
   onUpdate,
   onReset,
   hasActive,
+  topPlayers = [],
 }: FilterPanelProps) {
   const [copied, setCopied] = useState(false);
 
@@ -86,6 +90,11 @@ export function FilterPanel({
           />
         ))}
       </div>
+      <PlayerPicker
+        players={topPlayers}
+        selected={filters.players}
+        onSelectionChange={(players) => onUpdate({ players })}
+      />
     </section>
   );
 }
