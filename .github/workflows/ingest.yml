@@ -16,6 +16,7 @@ concurrency:
 permissions:
   contents: write   # commit watchlist.yml
   issues: write     # open issue on failure
+  actions: write    # trigger analyze.yml via workflow_dispatch
 
 jobs:
   ingest:
