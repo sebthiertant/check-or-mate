@@ -194,9 +194,9 @@ describe("hasActiveFilters", () => {
   });
 
   it("returns true when players is non-empty", () => {
-    expect(
-      hasActiveFilters({ ...DEFAULT_FILTERS, players: ["hikaru"] }),
-    ).toBe(true);
+    expect(hasActiveFilters({ ...DEFAULT_FILTERS, players: ["hikaru"] })).toBe(
+      true,
+    );
   });
 });
 
@@ -204,13 +204,18 @@ describe("hasActiveFilters", () => {
 
 describe("filterGames — players", () => {
   it("returns all games when players is empty", () => {
-    expect(filterGames(FIXTURES, DEFAULT_FILTERS)).toHaveLength(FIXTURES.length);
+    expect(filterGames(FIXTURES, DEFAULT_FILTERS)).toHaveLength(
+      FIXTURES.length,
+    );
   });
 
   it("keeps only games featuring a selected player", () => {
     if (FIXTURES.length === 0) return;
     const player = FIXTURES[0].white;
-    const result = filterGames(FIXTURES, { ...DEFAULT_FILTERS, players: [player] });
+    const result = filterGames(FIXTURES, {
+      ...DEFAULT_FILTERS,
+      players: [player],
+    });
     expect(
       result.every(
         (g) =>
@@ -223,9 +228,9 @@ describe("filterGames — players", () => {
 
 describe("parseFilters — players", () => {
   it("parses a single player from the players param", () => {
-    expect(
-      parseFilters(new URLSearchParams("players=hikaru")).players,
-    ).toEqual(["hikaru"]);
+    expect(parseFilters(new URLSearchParams("players=hikaru")).players).toEqual(
+      ["hikaru"],
+    );
   });
 
   it("parses multiple comma-separated players", () => {

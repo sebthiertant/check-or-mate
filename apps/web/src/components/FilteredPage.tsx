@@ -66,9 +66,17 @@ export function FilteredPage({ games }: FilteredPageProps) {
         hasActive={active}
         topPlayers={topPlayers}
       />
-      <GameList games={pagedGames} onReset={resetFilters} rankOffset={pageStart} />
+      <GameList
+        games={pagedGames}
+        onReset={resetFilters}
+        rankOffset={pageStart}
+      />
       {totalPages > 1 && (
-        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} />
+        <Pagination
+          page={page}
+          totalPages={totalPages}
+          onPageChange={setPage}
+        />
       )}
     </>
   );

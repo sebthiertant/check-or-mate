@@ -76,7 +76,8 @@ export function serializeFilters(filters: Filters): string {
   }
 
   if (filters.sort !== "overall") params.set("sort", filters.sort);
-  if (filters.players.length > 0) params.set("players", filters.players.join(","));
+  if (filters.players.length > 0)
+    params.set("players", filters.players.join(","));
 
   return params.toString();
 }
@@ -87,7 +88,11 @@ export function filterGames(games: Game[], filters: Filters): Game[] {
     if (filters.players.length > 0) {
       const wl = game.white.toLowerCase();
       const bl = game.black.toLowerCase();
-      if (!filters.players.some((p) => p.toLowerCase() === wl || p.toLowerCase() === bl)) {
+      if (
+        !filters.players.some(
+          (p) => p.toLowerCase() === wl || p.toLowerCase() === bl,
+        )
+      ) {
         return false;
       }
     }
