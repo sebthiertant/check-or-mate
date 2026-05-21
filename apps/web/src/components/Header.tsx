@@ -1,5 +1,5 @@
 interface HeaderProps {
-  gameCount: number
+  gameCount: number;
 }
 
 export function Header({ gameCount }: HeaderProps) {
@@ -26,7 +26,7 @@ export function Header({ gameCount }: HeaderProps) {
         <Stat value="Stockfish 16" label="analysis engine" />
       </div>
     </header>
-  )
+  );
 }
 
 function Stat({ value, label }: { value: string | number; label: string }) {
@@ -37,9 +37,9 @@ function Stat({ value, label }: { value: string | number; label: string }) {
       </span>
       <span className="text-zinc-600 text-xs">{label}</span>
     </div>
-  )
+  );
 }
 
 function Divider() {
-  return <span className="text-zinc-800">·</span>
+  return <span className="text-zinc-800">·</span>;
 }

@@ -1,9 +1,11 @@
-import { FIXTURES } from "@/lib/fixtures"
-import { Header } from "@/components/Header"
-import { GameCard } from "@/components/GameCard"
+import { FIXTURES } from "@/lib/fixtures";
+import { Header } from "@/components/Header";
+import { GameCard } from "@/components/GameCard";
 
 export default function HomePage() {
-  const games = [...FIXTURES].sort((a, b) => b.scores.overall - a.scores.overall)
+  const games = [...FIXTURES].sort(
+    (a, b) => b.scores.overall - a.scores.overall,
+  );
 
   return (
     <main className="min-h-screen bg-zinc-950">
@@ -40,5 +42,5 @@ export default function HomePage() {
         </footer>
       </div>
     </main>
-  )
+  );
 }

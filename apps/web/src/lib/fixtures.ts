@@ -1,4 +1,4 @@
-import type { Game } from "./types"
+import type { Game } from "./types";
 
 export const FIXTURES: Game[] = [
   {
@@ -12,7 +12,16 @@ export const FIXTURES: Game[] = [
     opening_name: "Sicilian Najdorf, English Attack",
     time_class: "blitz",
     date: "2026-01-14",
-    scores: { sacrifice: 91, eval_swing: 88, brilliancy: 94, time_pressure: 78, endgame_quality: 42, rating_upset: 65, opening_rarity: 34, overall: 94 },
+    scores: {
+      sacrifice: 91,
+      eval_swing: 88,
+      brilliancy: 94,
+      time_pressure: 78,
+      endgame_quality: 42,
+      rating_upset: 65,
+      opening_rarity: 34,
+      overall: 94,
+    },
   },
   {
     id: "firouzja-nepo-2025-11",
@@ -25,7 +34,16 @@ export const FIXTURES: Game[] = [
     opening_name: "Ruy López, Berlin Defence",
     time_class: "rapid",
     date: "2025-11-03",
-    scores: { sacrifice: 27, eval_swing: 95, brilliancy: 71, time_pressure: 89, endgame_quality: 38, rating_upset: 18, opening_rarity: 52, overall: 89 },
+    scores: {
+      sacrifice: 27,
+      eval_swing: 95,
+      brilliancy: 71,
+      time_pressure: 89,
+      endgame_quality: 38,
+      rating_upset: 18,
+      opening_rarity: 52,
+      overall: 89,
+    },
   },
   {
     id: "pragga-caruana-2025-09",
@@ -38,7 +56,16 @@ export const FIXTURES: Game[] = [
     opening_name: "Queen's Gambit Declined, Hastings Variation",
     time_class: "classical",
     date: "2025-09-21",
-    scores: { sacrifice: 45, eval_swing: 62, brilliancy: 83, time_pressure: 14, endgame_quality: 77, rating_upset: 92, opening_rarity: 81, overall: 87 },
+    scores: {
+      sacrifice: 45,
+      eval_swing: 62,
+      brilliancy: 83,
+      time_pressure: 14,
+      endgame_quality: 77,
+      rating_upset: 92,
+      opening_rarity: 81,
+      overall: 87,
+    },
   },
   {
     id: "carlsen-ding-2024-12",
@@ -51,7 +78,16 @@ export const FIXTURES: Game[] = [
     opening_name: "English Opening, King's English",
     time_class: "rapid",
     date: "2024-12-07",
-    scores: { sacrifice: 88, eval_swing: 74, brilliancy: 96, time_pressure: 31, endgame_quality: 55, rating_upset: 24, opening_rarity: 73, overall: 85 },
+    scores: {
+      sacrifice: 88,
+      eval_swing: 74,
+      brilliancy: 96,
+      time_pressure: 31,
+      endgame_quality: 55,
+      rating_upset: 24,
+      opening_rarity: 73,
+      overall: 85,
+    },
   },
   {
     id: "so-gukesh-2026-02",
@@ -64,7 +100,16 @@ export const FIXTURES: Game[] = [
     opening_name: "Queen's Indian, Nimzowitsch Variation",
     time_class: "blitz",
     date: "2026-02-09",
-    scores: { sacrifice: 12, eval_swing: 81, brilliancy: 44, time_pressure: 96, endgame_quality: 88, rating_upset: 8, opening_rarity: 29, overall: 82 },
+    scores: {
+      sacrifice: 12,
+      eval_swing: 81,
+      brilliancy: 44,
+      time_pressure: 96,
+      endgame_quality: 88,
+      rating_upset: 8,
+      opening_rarity: 29,
+      overall: 82,
+    },
   },
   {
     id: "duda-aronian-2025-05",
@@ -77,7 +122,16 @@ export const FIXTURES: Game[] = [
     opening_name: "Caro-Kann, Advance Variation",
     time_class: "classical",
     date: "2025-05-17",
-    scores: { sacrifice: 33, eval_swing: 57, brilliancy: 38, time_pressure: 9, endgame_quality: 94, rating_upset: 22, opening_rarity: 87, overall: 79 },
+    scores: {
+      sacrifice: 33,
+      eval_swing: 57,
+      brilliancy: 38,
+      time_pressure: 9,
+      endgame_quality: 94,
+      rating_upset: 22,
+      opening_rarity: 87,
+      overall: 79,
+    },
   },
   {
     id: "giri-mvl-2025-07",
@@ -90,7 +144,16 @@ export const FIXTURES: Game[] = [
     opening_name: "Ruy López, Archangel Variation",
     time_class: "rapid",
     date: "2025-07-30",
-    scores: { sacrifice: 72, eval_swing: 49, brilliancy: 67, time_pressure: 55, endgame_quality: 31, rating_upset: 19, opening_rarity: 91, overall: 76 },
+    scores: {
+      sacrifice: 72,
+      eval_swing: 49,
+      brilliancy: 67,
+      time_pressure: 55,
+      endgame_quality: 31,
+      rating_upset: 19,
+      opening_rarity: 91,
+      overall: 76,
+    },
   },
   {
     id: "vidit-rapport-2025-03",
@@ -103,6 +166,15 @@ export const FIXTURES: Game[] = [
     opening_name: "Anderssen's Opening",
     time_class: "blitz",
     date: "2025-03-22",
-    scores: { sacrifice: 61, eval_swing: 43, brilliancy: 52, time_pressure: 84, endgame_quality: 17, rating_upset: 41, opening_rarity: 98, overall: 73 },
+    scores: {
+      sacrifice: 61,
+      eval_swing: 43,
+      brilliancy: 52,
+      time_pressure: 84,
+      endgame_quality: 17,
+      rating_upset: 41,
+      opening_rarity: 98,
+      overall: 73,
+    },
   },
-]
+];

@@ -10,6 +10,9 @@
     "typecheck": "tsc --noEmit",
     "format:check": "prettier --check src/"
   },
+  "eslintConfig": {
+    "extends": ["next/core-web-vitals"]
+  },
   "dependencies": {
     "next": "14.2.21",
     "react": "^18.3.1",

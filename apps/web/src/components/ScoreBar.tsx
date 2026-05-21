@@ -1,8 +1,8 @@
-import { scoreColor } from "@/lib/utils"
+import { scoreColor } from "@/lib/utils";
 
 interface ScoreBarProps {
-  label: string
-  value: number
+  label: string;
+  value: number;
 }
 
 export function ScoreBar({ label, value }: ScoreBarProps) {
@@ -21,5 +21,5 @@ export function ScoreBar({ label, value }: ScoreBarProps) {
         {value}
       </span>
     </div>
-  )
+  );
 }
