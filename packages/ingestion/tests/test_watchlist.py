@@ -4,7 +4,7 @@ from pathlib import Path
 
 import httpx
 from ingestion.client import ChessComClient
-from ingestion.watchlist import load_players, populate
+from ingestion.watchlist import load_players, load_since, populate
 
 _LEADERBOARD_URL = "https://api.chess.com/pub/leaderboards"
 
@@ -45,6 +45,23 @@ def test_load_players_empty_when_no_key(tmp_path: Path) -> None:
     watchlist.write_text("strategy: leaderboard\n")
 
     assert load_players(watchlist) == []
+
+
+# ── load_since ────────────────────────────────────────────────────────────────
+
+
+def test_load_since_returns_year_month_tuple(tmp_path: Path) -> None:
+    watchlist = tmp_path / "watchlist.yml"
+    watchlist.write_text("since: '2025-05'\n")
+
+    assert load_since(watchlist) == (2025, 5)
+
+
+def test_load_since_returns_none_when_absent(tmp_path: Path) -> None:
+    watchlist = tmp_path / "watchlist.yml"
+    watchlist.write_text("players:\n  - hikaru\n")
+
+    assert load_since(watchlist) is None
 
 
 # ── populate — static strategy ────────────────────────────────────────────────

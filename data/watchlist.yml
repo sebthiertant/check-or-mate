@@ -12,6 +12,7 @@
 strategy: leaderboard
 top_n: 200
 time_class: all
+since: "2025-05"   # n'ingère que les archives à partir de mai 2025
 
 extra_players:
   - polish_fighter3000

@@ -5,7 +5,7 @@ from unittest.mock import MagicMock
 
 from ingestion.models import ArchiveList, GamesArchive, PlayerResult, RawGame
 from ingestion.store import Store
-from ingestion.sync import Syncer, _parse_archive_url, _save_games_with_pgn
+from ingestion.sync import Syncer, _filter_archives, _parse_archive_url, _save_games_with_pgn
 
 _ARCHIVE_URL = "https://api.chess.com/pub/player/hikaru/games/2024/01"
 
@@ -102,6 +102,36 @@ def test_sync_player_accumulates_multiple_archives() -> None:
     count = syncer.sync_player("hikaru")
 
     assert count == 3
+
+
+def test_filter_archives_returns_all_when_no_since() -> None:
+    archives = [
+        "https://api.chess.com/pub/player/hikaru/games/2024/01",
+        "https://api.chess.com/pub/player/hikaru/games/2025/06",
+    ]
+    assert _filter_archives(archives, None) == archives
+
+
+def test_filter_archives_excludes_older_archives() -> None:
+    jan = "https://api.chess.com/pub/player/hikaru/games/2024/01"
+    dec = "https://api.chess.com/pub/player/hikaru/games/2024/12"
+    jan25 = "https://api.chess.com/pub/player/hikaru/games/2025/01"
+
+    assert _filter_archives([jan, dec, jan25], (2024, 12)) == [dec, jan25]
+
+
+def test_sync_player_respects_since_filter() -> None:
+    old = "https://api.chess.com/pub/player/hikaru/games/2023/01"
+    recent = "https://api.chess.com/pub/player/hikaru/games/2025/01"
+    client = MagicMock()
+    client.list_archives.return_value = ArchiveList(archives=[old, recent])
+    client.fetch_games.return_value = GamesArchive(games=[_raw_game()])
+    store = _in_memory_store()
+
+    count = Syncer(client, store).sync_player("hikaru", since=(2025, 1))
+
+    assert count == 1
+    client.fetch_games.assert_called_once_with("hikaru", 2025, 1)
 
 
 def test_save_games_with_pgn_skips_pgn_less_games() -> None:

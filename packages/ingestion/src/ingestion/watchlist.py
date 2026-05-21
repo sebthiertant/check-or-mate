@@ -24,6 +24,15 @@ def load_players(path: Path) -> list[str]:
     return list(data.get("players", []))
 
 
+def load_since(path: Path) -> tuple[int, int] | None:
+    """Return the (year, month) lower bound from the watchlist config, or None."""
+    data = _read_yaml(path)
+    since_str = data.get("since")
+    if not since_str:
+        return None
+    return _parse_since(str(since_str))
+
+
 def populate(path: Path, client: ChessComClient) -> list[str]:
     """Fetch leaderboard players and rewrite the ``players`` key in the file.
 
@@ -38,6 +47,12 @@ def populate(path: Path, client: ChessComClient) -> list[str]:
 
 
 # ── private helpers ───────────────────────────────────────────────────────────
+
+
+def _parse_since(since_str: str) -> tuple[int, int]:
+    """Parse a ``YYYY-MM`` string into a (year, month) tuple."""
+    year, month = since_str.strip().split("-")[:2]
+    return int(year), int(month)
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
