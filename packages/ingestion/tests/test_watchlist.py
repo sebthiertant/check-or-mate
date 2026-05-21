@@ -8,6 +8,7 @@ from ingestion.watchlist import load_players, populate
 
 _LEADERBOARD_URL = "https://api.chess.com/pub/leaderboards"
 
+
 def _entry(rank: int, username: str) -> dict[str, object]:
     return {"rank": rank, "username": username, "player_id": rank, "url": ""}
 
