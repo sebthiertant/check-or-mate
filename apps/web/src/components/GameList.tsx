@@ -4,9 +4,10 @@ import { GameCard } from "./GameCard";
 interface GameListProps {
   games: Game[];
   onReset: () => void;
+  rankOffset?: number;
 }
 
-export function GameList({ games, onReset }: GameListProps) {
+export function GameList({ games, onReset, rankOffset = 0 }: GameListProps) {
   if (games.length === 0) {
     return <EmptyState onReset={onReset} />;
   }
@@ -15,7 +16,7 @@ export function GameList({ games, onReset }: GameListProps) {
     <section aria-label="Curated games">
       <div className="flex flex-col gap-4">
         {games.map((game, index) => (
-          <GameCard key={game.id} game={game} rank={index + 1} />
+          <GameCard key={game.id} game={game} rank={rankOffset + index + 1} />
         ))}
       </div>
     </section>

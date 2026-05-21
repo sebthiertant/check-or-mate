@@ -1,5 +1,6 @@
 """Corpus-based normalisation to [0, 100]."""
 
+import dataclasses
 from collections import Counter
 
 from .config import ScoringConfig, ScoringWeights
@@ -48,12 +49,28 @@ def normalize_corpus(
     raw_scores: list[RawScores],
     config: ScoringConfig,
 ) -> list[NormalizedScores]:
-    """Min-max normalise all dimensions across the corpus to [0, 100]."""
+    """Min-max normalise all dimensions, then rescale overall to [0, 100]."""
     if not raw_scores:
         return []
 
     ranges = _compute_ranges(raw_scores)
-    return [_normalize_one(raw, ranges, config.weights) for raw in raw_scores]
+    results = [_normalize_one(raw, ranges, config.weights) for raw in raw_scores]
+    return _rescale_overall(results)
+
+
+def _rescale_overall(results: list[NormalizedScores]) -> list[NormalizedScores]:
+    """Rescale the weighted overall so the top game in the corpus shows 100."""
+    overall_min = min(r.overall for r in results)
+    overall_max = max(r.overall for r in results)
+    if overall_max == overall_min:
+        return results
+    return [
+        dataclasses.replace(
+            r,
+            overall=round((r.overall - overall_min) / (overall_max - overall_min) * 100),
+        )
+        for r in results
+    ]
 
 
 def _compute_ranges(raw_scores: list[RawScores]) -> dict[str, tuple[float, float]]:

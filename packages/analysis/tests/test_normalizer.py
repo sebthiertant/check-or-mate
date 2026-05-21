@@ -169,6 +169,13 @@ def test_normalize_corpus_overall_uses_active_weights_only() -> None:
     assert result[1].overall > result[0].overall
 
 
+def test_normalize_corpus_overall_top_game_scores_100() -> None:
+    # After corpus rescaling the best game reaches 100 overall.
+    raw = [_raw(sacrifice=0.0), _raw(sacrifice=9.0)]
+    result = normalize_corpus(raw, _CONFIG)
+    assert result[1].overall == 100
+
+
 def test_normalize_corpus_rarity_most_common_maps_to_zero() -> None:
     # "B90" appears 3 times (rarity=1), "C65" appears once (rarity=3).
     # After normalization B90 → 0, C65 → 100.
