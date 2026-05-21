@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -62,7 +62,7 @@ jobs:
     needs: ts-lint
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -76,7 +76,7 @@ jobs:
     needs: ts-lint
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -90,7 +90,7 @@ jobs:
     needs: [ts-typecheck, ts-test]
     steps:
       - uses: actions/checkout@v5
-      - uses: pnpm/action-setup@v5
+      - uses: pnpm/action-setup@v6
       - uses: actions/setup-node@v4
         with:
           node-version: 22
