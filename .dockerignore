@@ -1,0 +1,34 @@
+# Dépôt git et CI
+.git/
+.github/
+
+# Outillage local
+.claude/
+.devcontainer/
+
+# Dépendances Node (installées pendant le build Docker)
+node_modules/
+apps/web/node_modules/
+apps/web/.next/
+apps/web/out/
+
+# Packages Python (non nécessaires pour le build Next.js)
+packages/
+
+# Données volumineuses
+data/games.db
+data/*.db-shm
+data/*.db-wal
+data/scratch/
+
+# Variables d'environnement locales
+.env
+.env.local
+.env.*.local
+
+# OS / éditeurs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
