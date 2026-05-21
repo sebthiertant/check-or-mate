@@ -1,7 +1,12 @@
+"use client";
+
+import { useState } from "react";
+
 import { formatDate } from "@/lib/utils";
 import type { Game } from "@/lib/types";
 import { ResultBadge } from "./ResultBadge";
 import { DimensionBars } from "./DimensionBars";
+import { BoardViewer } from "./BoardViewer";
 
 const TIME_CLASS_LABEL: Record<Game["time_class"], string> = {
   bullet: "Bullet",
@@ -57,8 +62,13 @@ function OverallScore({ value }: { value: number }) {
 }
 
 export function GameCard({ game, rank }: GameCardProps) {
+  const [expanded, setExpanded] = useState(false);
+
   return (
-    <article className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors cursor-pointer">
+    <article
+      className="bg-zinc-900 border border-zinc-800 rounded-xl p-6 hover:border-zinc-700 transition-colors cursor-pointer"
+      onClick={() => setExpanded((v) => !v)}
+    >
       <div className="flex items-start justify-between">
         <div className="flex items-start gap-4 min-w-0">
           <span className="shrink-0 text-xs font-mono text-zinc-600 pt-1 w-6 text-right">
@@ -70,6 +80,9 @@ export function GameCard({ game, rank }: GameCardProps) {
       </div>
       <div className="pl-10">
         <DimensionBars scores={game.scores} />
+        {expanded && (
+          <BoardViewer pgn={game.pgn ?? ""} gameId={game.id} />
+        )}
       </div>
     </article>
   );
