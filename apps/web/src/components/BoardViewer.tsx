@@ -71,7 +71,10 @@ function NavButton({
 export function BoardViewer({ pgn, gameId }: BoardViewerProps) {
   const [moveIndex, setMoveIndex] = useState(0);
   const moves = useMemo(() => parseMoves(pgn), [pgn]);
-  const position = useMemo(() => positionAt(moves, moveIndex), [moves, moveIndex]);
+  const position = useMemo(
+    () => positionAt(moves, moveIndex),
+    [moves, moveIndex],
+  );
   const hasMoves = moves.length > 0;
   const url = chessComUrl(gameId);
 
@@ -86,7 +89,11 @@ export function BoardViewer({ pgn, gameId }: BoardViewerProps) {
       />
       {hasMoves ? (
         <div className="flex items-center gap-1">
-          <NavButton label="Début" onClick={() => setMoveIndex(0)} disabled={moveIndex === 0}>
+          <NavButton
+            label="Début"
+            onClick={() => setMoveIndex(0)}
+            disabled={moveIndex === 0}
+          >
             ◀◀
           </NavButton>
           <NavButton

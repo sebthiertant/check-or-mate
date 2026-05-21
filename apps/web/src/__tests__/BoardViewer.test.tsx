@@ -35,7 +35,10 @@ describe("BoardViewer — PGN vide", () => {
 
   it("lien vers chess.com pour un ID fictif", () => {
     render(<BoardViewer pgn="" gameId="nakamura-carlsen-2026-01" />);
-    expect(screen.getByRole("link")).toHaveAttribute("href", "https://www.chess.com");
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      "https://www.chess.com",
+    );
   });
 
   it("lien vers la partie pour un ID numérique", () => {

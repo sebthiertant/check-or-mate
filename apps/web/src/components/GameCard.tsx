@@ -80,9 +80,7 @@ export function GameCard({ game, rank }: GameCardProps) {
       </div>
       <div className="pl-10">
         <DimensionBars scores={game.scores} />
-        {expanded && (
-          <BoardViewer pgn={game.pgn ?? ""} gameId={game.id} />
-        )}
+        {expanded && <BoardViewer pgn={game.pgn ?? ""} gameId={game.id} />}
       </div>
     </article>
   );
