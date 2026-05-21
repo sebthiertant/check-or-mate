@@ -1,6 +1,6 @@
 """Domain models for Chess.com API responses."""
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class PlayerResult(BaseModel):
@@ -26,3 +26,19 @@ class GamesArchive(BaseModel):
 
 class ArchiveList(BaseModel):
     archives: list[str]
+
+
+class LeaderboardEntry(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+    username: str
+    rank: int
+
+
+class Leaderboard(BaseModel):
+    """Top-50 players per live time control from the Chess.com leaderboard API."""
+
+    model_config = ConfigDict(extra="ignore")
+    live_bullet: list[LeaderboardEntry] = []
+    live_blitz: list[LeaderboardEntry] = []
+    live_rapid: list[LeaderboardEntry] = []
+    daily: list[LeaderboardEntry] = []

@@ -31,6 +31,10 @@ jobs:
 
       - run: uv sync --package ingestion --frozen
 
+      - name: Populate watchlist from leaderboard
+        if: ${{ !inputs.player }}
+        run: uv run ingest populate --watchlist data/watchlist.yml
+
       - name: Sync games
         run: |
           if [ -n "${{ inputs.player }}" ]; then
@@ -39,11 +43,11 @@ jobs:
             uv run ingest sync-all --watchlist data/watchlist.yml --db data/games.db
           fi
 
-      - name: Commit updated database
+      - name: Commit updated data
         run: |
           git config user.name  "check-or-mate bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/games.db
+          git add data/games.db data/watchlist.yml
           git diff --staged --quiet || git commit -m "chore(data): nightly ingestion $(date -u +%Y-%m-%d)"
           git push
 

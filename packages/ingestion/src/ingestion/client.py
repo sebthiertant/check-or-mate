@@ -2,7 +2,7 @@
 
 import httpx
 
-from .models import ArchiveList, GamesArchive
+from .models import ArchiveList, GamesArchive, Leaderboard
 
 _BASE_URL = "https://api.chess.com/pub"
 _DEFAULT_HEADERS = {"User-Agent": "check-or-mate/0.1 (github.com/sebthiertant/check-or-mate)"}
@@ -23,6 +23,12 @@ class ChessComClient:
         response = self._http.get(f"{_BASE_URL}/player/{player}/games/{year}/{month:02d}")
         response.raise_for_status()
         return GamesArchive.model_validate(response.json())
+
+    def fetch_leaderboard(self) -> Leaderboard:
+        """Return the top-50 players for each live time control."""
+        response = self._http.get(f"{_BASE_URL}/leaderboards")
+        response.raise_for_status()
+        return Leaderboard.model_validate(response.json())
 
     def close(self) -> None:
         self._http.close()
