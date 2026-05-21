@@ -13,13 +13,10 @@ permissions:
 
 jobs:
   analyze:
-    name: Score un-analyzed games
+    name: Score games with Stockfish
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        shard: [0, 1, 2, 3]   # 4 parallel runners split the work
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -27,23 +24,26 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install Stockfish 16
-        run: sudo apt-get install -y stockfish
-
-      - run: uv sync --package analysis
-
-      - name: Run analysis (shard ${{ matrix.shard }} of 4)
+      - name: Install Stockfish
         run: |
-          uv run python -m analysis score \
-            --shard-index ${{ matrix.shard }} \
-            --shard-count 4
+          sudo apt-get update -qq
+          sudo apt-get install -y stockfish
+          echo "STOCKFISH_PATH=$(command -v stockfish)" >> "$GITHUB_ENV"
 
-      - name: Commit scored games
+      - run: uv sync --package analysis --frozen
+
+      - name: Score games
+        run: |
+          uv run analysis score \
+            --engine-path "$STOCKFISH_PATH" \
+            --output data/scores.json
+
+      - name: Commit scored results
         run: |
           git config user.name  "check-or-mate bot"
           git config user.email "bot@users.noreply.github.com"
-          git add data/games.db
-          git diff --staged --quiet || git commit -m "chore(data): analysis shard ${{ matrix.shard }} $(date -u +%Y-%m-%dT%H:%M)"
+          git add data/scores.json
+          git diff --staged --quiet || git commit -m "chore(data): analysis scores $(date -u +%Y-%m-%dT%H:%M)"
           git push
 
       - name: Open issue on failure
@@ -54,7 +54,7 @@ jobs:
             await github.rest.issues.create({
               owner: context.repo.owner,
               repo:  context.repo.repo,
-              title: `Analysis failed — shard ${{ matrix.shard }} — ${new Date().toISOString().slice(0,10)}`,
+              title: `Analysis failed — ${new Date().toISOString().slice(0,10)}`,
               labels: ['bug'],
-              body: `Stockfish analysis failed on shard ${{ matrix.shard }}. [See run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).`
+              body: `Stockfish analysis workflow failed. [See run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}).`
             })

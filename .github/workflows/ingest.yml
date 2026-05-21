@@ -6,10 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       player:
-        description: "Chess.com username to fetch (leave blank for full watchlist)"
-        required: false
-      month:
-        description: "Month to fetch in YYYY-MM format (leave blank for latest)"
+        description: "Chess.com username to sync (leave blank for full watchlist)"
         required: false
 
 concurrency:
@@ -24,7 +21,7 @@ jobs:
     name: Fetch game archives
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -32,21 +29,15 @@ jobs:
         with:
           python-version: "3.12"
 
-      - run: uv sync --package ingestion
+      - run: uv sync --package ingestion --frozen
 
-      - name: Fetch games
+      - name: Sync games
         run: |
           if [ -n "${{ inputs.player }}" ]; then
-            PLAYER_FLAG="--player ${{ inputs.player }}"
+            uv run ingest sync --player "${{ inputs.player }}" --db data/games.db
           else
-            PLAYER_FLAG=""
+            uv run ingest sync-all --watchlist data/watchlist.yml --db data/games.db
           fi
-          if [ -n "${{ inputs.month }}" ]; then
-            MONTH_FLAG="--month ${{ inputs.month }}"
-          else
-            MONTH_FLAG=""
-          fi
-          uv run python -m ingestion fetch $PLAYER_FLAG $MONTH_FLAG
 
       - name: Commit updated database
         run: |

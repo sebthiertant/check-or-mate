@@ -1,25 +1,31 @@
 """CLI: python -m analysis score --since YYYY-MM-DD --db data/games.db"""
 
 import argparse
+import dataclasses
 import io
+import json
 import sqlite3
 from datetime import UTC, datetime
 from pathlib import Path
 
 import chess.pgn
 
+from .cache import EvalCache
 from .config import load_config
-from .models import GameRecord, GameResult
+from .engine import EngineConfig
+from .evaluator import Evaluator
+from .models import GameRecord, GameResult, NormalizedScores
 from .scorer import Scorer
 
 
 def main() -> None:
     args = _build_argument_parser().parse_args()
-    config_path = Path(args.config) if args.config else None
     _run_score(
         db_path=Path(args.db),
         since=args.since,
-        config_path=config_path,
+        config_path=Path(args.config) if args.config else None,
+        engine_path=args.engine_path,
+        output_path=Path(args.output) if args.output else None,
     )
 
 
@@ -36,10 +42,18 @@ def _build_argument_parser() -> argparse.ArgumentParser:
     )
     score_cmd.add_argument("--db", default="data/games.db", help="Path to the SQLite database")
     score_cmd.add_argument("--config", default=None, help="Path to an alternative config.yml")
+    score_cmd.add_argument("--engine-path", default=None, help="Path to Stockfish binary")
+    score_cmd.add_argument("--output", default=None, help="Write JSON scores to this file")
     return parser
 
 
-def _run_score(db_path: Path, since: str, config_path: Path | None = None) -> None:
+def _run_score(
+    db_path: Path,
+    since: str,
+    config_path: Path | None = None,
+    engine_path: str | None = None,
+    output_path: Path | None = None,
+) -> None:
     config = load_config(config_path)
     records = _load_game_records(db_path, since)
 
@@ -47,7 +61,8 @@ def _run_score(db_path: Path, since: str, config_path: Path | None = None) -> No
         print(f"No games found in {db_path} since {since}.")
         return
 
-    scorer = Scorer(config)
+    evaluator = _build_evaluator(engine_path) if engine_path else None
+    scorer = Scorer(config, evaluator)
     scores = scorer.score_corpus(records)
 
     _print_header()
@@ -62,6 +77,23 @@ def _run_score(db_path: Path, since: str, config_path: Path | None = None) -> No
             f"or={normalized.opening_rarity:3d}"
         )
     print(f"\n{len(records)} game(s) scored.")
+    if output_path:
+        _write_json(output_path, records, scores)
+
+
+def _build_evaluator(engine_path: str) -> Evaluator:
+    config = EngineConfig(path=engine_path)
+    cache = EvalCache(Path("data/eval_cache"))
+    return Evaluator(config, cache)
+
+
+def _write_json(
+    output_path: Path, records: list[GameRecord], scores: list[NormalizedScores]
+) -> None:
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    data = [{"game_id": r.game_id, **dataclasses.asdict(s)} for r, s in zip(records, scores)]
+    output_path.write_text(json.dumps(data, indent=2))
+    print(f"Scores written to {output_path}.")
 
 
 def _print_header() -> None:
@@ -113,7 +145,5 @@ def _build_game_record(
 
 def _iso_date_to_unix(date_string: str) -> int:
     """Convert an ISO date string (YYYY-MM-DD) to a UTC Unix timestamp."""
-    parts = date_string.split("-")
-    year, month, day = int(parts[0]), int(parts[1]), int(parts[2])
-    midnight_utc = datetime(year, month, day, tzinfo=UTC)
-    return int(midnight_utc.timestamp())
+    year, month, day = (int(part) for part in date_string.split("-"))
+    return int(datetime(year, month, day, tzinfo=UTC).timestamp())

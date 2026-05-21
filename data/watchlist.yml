@@ -1,0 +1,8 @@
+# Players to monitor for check-or-mate.
+# The nightly ingest.yml workflow syncs all archives for each player.
+players:
+  - hikaru
+  - magnuscarlsen
+  - firouzja2003
+  - lachesisq
+  - polish_fighter3000

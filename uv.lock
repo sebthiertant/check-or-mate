@@ -199,6 +199,7 @@ dependencies = [
     { name = "httpx" },
     { name = "pydantic" },
     { name = "python-chess" },
+    { name = "pyyaml" },
 ]
 
 [package.dev-dependencies]
@@ -211,6 +212,7 @@ requires-dist = [
     { name = "httpx", specifier = ">=0.27.0" },
     { name = "pydantic", specifier = ">=2.7.0" },
     { name = "python-chess", specifier = ">=1.999" },
+    { name = "pyyaml", specifier = ">=6.0" },
 ]
 
 [package.metadata.requires-dev]
