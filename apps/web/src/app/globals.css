@@ -2,20 +2,221 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design tokens ──────────────────────────────────────────────────────── */
+:root {
+  --bg: #0b0a09;
+  --panel: #131210;
+  --panel-2: #1a1815;
+  --panel-3: #221f1b;
+  --border: #2a2622;
+  --border-strong: #3a342d;
+  --text: #e9e5dc;
+  --text-muted: #8c867a;
+  --text-dim: #5c574d;
+  --accent: #f5a524;
+  --accent-soft: rgba(245, 165, 36, 0.12);
+  --accent-line: rgba(245, 165, 36, 0.32);
+  --sq-light: #ebd3b0;
+  --sq-dark: #b48560;
+  --good: #7dd3a8;
+  --bad: #e8826b;
+
+  --r-sm: 4px;
+  --r: 8px;
+  --r-lg: 12px;
+  --r-xl: 16px;
+}
+
+/* ─── Base ───────────────────────────────────────────────────────────────── */
 @layer base {
+  html {
+    background: var(--bg);
+    color: var(--text);
+  }
+
   body {
-    @apply bg-zinc-950 text-zinc-100 antialiased;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-family: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+    font-size: 14px;
   }
 
+  /* Scrollbar */
   ::-webkit-scrollbar {
-    @apply w-1.5;
+    width: 6px;
+    height: 6px;
   }
-
   ::-webkit-scrollbar-track {
-    @apply bg-zinc-950;
+    background: var(--bg);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-dim);
   }
 
-  ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-700 rounded-full;
+  /* Focus ring */
+  :focus-visible {
+    outline: 2px solid var(--accent-line);
+    outline-offset: 2px;
   }
+
+  /* Reset */
+  button {
+    cursor: pointer;
+  }
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+/* ─── Typography helpers ─────────────────────────────────────────────────── */
+@layer utilities {
+  .font-mono-app {
+    font-family: var(--font-ibm-mono), ui-monospace, monospace;
+  }
+
+  .text-accent {
+    color: var(--accent);
+  }
+  .text-muted {
+    color: var(--text-muted);
+  }
+  .text-dim {
+    color: var(--text-dim);
+  }
+  .text-main {
+    color: var(--text);
+  }
+
+  .bg-panel {
+    background: var(--panel);
+  }
+  .bg-panel-2 {
+    background: var(--panel-2);
+  }
+  .bg-panel-3 {
+    background: var(--panel-3);
+  }
+
+  .border-default {
+    border-color: var(--border);
+  }
+  .border-strong {
+    border-color: var(--border-strong);
+  }
+
+  /* Section label style */
+  .section-label {
+    font-family: var(--font-ibm-mono), ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+
+  /* Eyebrow style */
+  .eyebrow {
+    font-family: var(--font-ibm-mono), ui-monospace, monospace;
+    font-size: 10px;
+    font-weight: 400;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+  }
+}
+
+/* ─── Range slider custom styling ────────────────────────────────────────── */
+input[type="range"].dim-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--accent) var(--pct, 0%),
+    var(--border) var(--pct, 0%)
+  );
+  outline: none;
+  cursor: pointer;
+}
+
+input[type="range"].dim-slider::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--panel);
+  box-shadow: 0 0 0 1px var(--accent);
+  transition:
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+input[type="range"].dim-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+}
+
+input[type="range"].dim-slider::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 2px solid var(--panel);
+  cursor: pointer;
+}
+
+/* ─── Eval rail ──────────────────────────────────────────────────────────── */
+.eval-rail {
+  position: relative;
+  width: 12px;
+  background: var(--border);
+  border-radius: var(--r-sm);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.eval-fill {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, #ffffff, #d4d0c8);
+  transition: height 0.3s ease;
+}
+
+/* ─── Animations ─────────────────────────────────────────────────────────── */
+@keyframes bar-fill {
+  from {
+    width: 0%;
+  }
+  to {
+    width: var(--bar-width);
+  }
+}
+
+@keyframes fs-enter {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bar-fill {
+  animation: bar-fill 0.6s ease-out forwards;
+}
+.animate-fs-enter {
+  animation: fs-enter 0.2s ease-out forwards;
 }

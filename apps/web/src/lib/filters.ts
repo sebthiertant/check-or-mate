@@ -1,6 +1,7 @@
 import type { Game, ScoreDimension, Scores } from "./types";
 
 export type SortKey = keyof Scores;
+export type TimeControl = "all" | "Bullet" | "Blitz" | "Rapid";
 
 export interface Filters {
   sacrifice: number;
@@ -12,6 +13,8 @@ export interface Filters {
   opening_rarity: number;
   sort: SortKey;
   players: string[];
+  timeControl: TimeControl;
+  search: string;
 }
 
 export const SCORE_DIMENSIONS = [
@@ -39,9 +42,13 @@ export const DEFAULT_FILTERS: Filters = {
   opening_rarity: 0,
   sort: "overall",
   players: [],
+  timeControl: "all",
+  search: "",
 };
 
-/** Parse URL search params into a Filters object, ignoring invalid values. */
+const TIME_CONTROL_VALUES: TimeControl[] = ["all", "Bullet", "Blitz", "Rapid"];
+
+/** Parse URL search params into a Filters object. */
 export function parseFilters(params: URLSearchParams): Filters {
   const filters = { ...DEFAULT_FILTERS };
 
@@ -64,10 +71,20 @@ export function parseFilters(params: URLSearchParams): Filters {
     filters.players = rawPlayers.split(",").filter(Boolean);
   }
 
+  const rawTc = params.get("tc");
+  if (rawTc && (TIME_CONTROL_VALUES as string[]).includes(rawTc)) {
+    filters.timeControl = rawTc as TimeControl;
+  }
+
+  const rawSearch = params.get("q");
+  if (rawSearch) {
+    filters.search = rawSearch;
+  }
+
   return filters;
 }
 
-/** Serialize Filters to a URL query string. Omits default (0 / "overall") values. */
+/** Serialize Filters to URL query string. Omits default values. */
 export function serializeFilters(filters: Filters): string {
   const params = new URLSearchParams();
 
@@ -78,13 +95,18 @@ export function serializeFilters(filters: Filters): string {
   if (filters.sort !== "overall") params.set("sort", filters.sort);
   if (filters.players.length > 0)
     params.set("players", filters.players.join(","));
+  if (filters.timeControl !== "all") params.set("tc", filters.timeControl);
+  if (filters.search.trim()) params.set("q", filters.search.trim());
 
   return params.toString();
 }
 
-/** Return games where every active threshold is satisfied. */
+/** Return games matching all active filters (AND logic). */
 export function filterGames(games: Game[], filters: Filters): Game[] {
+  const q = filters.search.trim().toLowerCase();
+
   return games.filter((game) => {
+    // Player filter (OR within selected players)
     if (filters.players.length > 0) {
       const wl = game.white.toLowerCase();
       const bl = game.black.toLowerCase();
@@ -96,20 +118,41 @@ export function filterGames(games: Game[], filters: Filters): Game[] {
         return false;
       }
     }
-    return SCORE_DIMENSIONS.every((dim) => game.scores[dim] >= filters[dim]);
+
+    // Dimension thresholds
+    if (!SCORE_DIMENSIONS.every((dim) => game.scores[dim] >= filters[dim])) {
+      return false;
+    }
+
+    // Time control
+    if (filters.timeControl !== "all") {
+      const tc = game.time_class;
+      if (tc.toLowerCase() !== filters.timeControl.toLowerCase()) return false;
+    }
+
+    // Free text search
+    if (q) {
+      const hay =
+        `${game.white} ${game.black} ${game.eco} ${game.opening_name}`.toLowerCase();
+      if (!hay.includes(q)) return false;
+    }
+
+    return true;
   });
 }
 
-/** Return a new sorted copy of games (descending by sortKey). */
+/** Return a new sorted copy (descending). */
 export function sortGames(games: Game[], sortKey: SortKey): Game[] {
   return [...games].sort((a, b) => b.scores[sortKey] - a.scores[sortKey]);
 }
 
-/** True when any threshold is non-zero, sort is not the default, or players are selected. */
+/** True when any filter deviates from defaults. */
 export function hasActiveFilters(filters: Filters): boolean {
   return (
     SCORE_DIMENSIONS.some((dim) => filters[dim] > 0) ||
     filters.sort !== "overall" ||
-    filters.players.length > 0
+    filters.players.length > 0 ||
+    filters.timeControl !== "all" ||
+    filters.search.trim().length > 0
   );
 }

@@ -6,116 +6,58 @@ import { DEFAULT_FILTERS } from "@/lib/filters";
 import { DIMENSION_LABELS } from "@/lib/types";
 
 const noop = vi.fn();
+const defaultProps = {
+  filters: DEFAULT_FILTERS,
+  onUpdate: noop,
+  onReset: noop,
+  isOpen: true,
+  onClose: noop,
+  topPlayers: [],
+};
 
 describe("FilterPanel", () => {
   it("renders a labeled slider for each dimension", () => {
-    render(
-      <FilterPanel
-        filters={DEFAULT_FILTERS}
-        onUpdate={noop}
-        onReset={noop}
-        hasActive={false}
-      />,
-    );
+    render(<FilterPanel {...defaultProps} />);
     for (const label of Object.values(DIMENSION_LABELS)) {
-      expect(screen.getByLabelText(label)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(`Seuil minimum ${label}`),
+      ).toBeInTheDocument();
     }
   });
 
   it("renders 7 range inputs", () => {
-    render(
-      <FilterPanel
-        filters={DEFAULT_FILTERS}
-        onUpdate={noop}
-        onReset={noop}
-        hasActive={false}
-      />,
-    );
+    render(<FilterPanel {...defaultProps} />);
     expect(screen.getAllByRole("slider")).toHaveLength(7);
   });
 
-  it("shows the Reset button when hasActive is true", () => {
-    render(
-      <FilterPanel
-        filters={{ ...DEFAULT_FILTERS, sacrifice: 50 }}
-        onUpdate={noop}
-        onReset={noop}
-        hasActive={true}
-      />,
-    );
-    expect(screen.getByRole("button", { name: /reset/i })).toBeInTheDocument();
-  });
-
-  it("hides the Reset button when hasActive is false", () => {
-    render(
-      <FilterPanel
-        filters={DEFAULT_FILTERS}
-        onUpdate={noop}
-        onReset={noop}
-        hasActive={false}
-      />,
-    );
+  it("shows the Réinitialiser button", () => {
+    render(<FilterPanel {...defaultProps} />);
     expect(
-      screen.queryByRole("button", { name: /reset/i }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: /réinitialiser/i }),
+    ).toBeInTheDocument();
   });
 
-  it("calls onReset when Reset is clicked", async () => {
+  it("calls onReset when Réinitialiser is clicked", async () => {
     const onReset = vi.fn();
-    render(
-      <FilterPanel
-        filters={{ ...DEFAULT_FILTERS, sacrifice: 50 }}
-        onUpdate={noop}
-        onReset={onReset}
-        hasActive={true}
-      />,
+    render(<FilterPanel {...defaultProps} onReset={onReset} />);
+    await userEvent.click(
+      screen.getByRole("button", { name: /réinitialiser/i }),
     );
-    await userEvent.click(screen.getByRole("button", { name: /reset/i }));
     expect(onReset).toHaveBeenCalledOnce();
   });
 
-  it("renders the Copy link button", () => {
-    render(
-      <FilterPanel
-        filters={DEFAULT_FILTERS}
-        onUpdate={noop}
-        onReset={noop}
-        hasActive={false}
-      />,
-    );
-    expect(
-      screen.getByRole("button", { name: /copy link/i }),
-    ).toBeInTheDocument();
+  it("shows time control buttons", () => {
+    render(<FilterPanel {...defaultProps} />);
+    expect(screen.getByRole("button", { name: /toutes/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /bullet/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /blitz/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /rapid/i })).toBeInTheDocument();
   });
 
-  it("renders the sort selector", () => {
-    render(
-      <FilterPanel
-        filters={DEFAULT_FILTERS}
-        onUpdate={noop}
-        onReset={noop}
-        hasActive={false}
-      />,
-    );
-    expect(
-      screen.getByRole("combobox", { name: /sort by/i }),
-    ).toBeInTheDocument();
-  });
-
-  it("calls onUpdate when sort changes", async () => {
+  it("calls onUpdate with timeControl when a cadence button is clicked", async () => {
     const onUpdate = vi.fn();
-    render(
-      <FilterPanel
-        filters={DEFAULT_FILTERS}
-        onUpdate={onUpdate}
-        onReset={noop}
-        hasActive={false}
-      />,
-    );
-    await userEvent.selectOptions(
-      screen.getByRole("combobox", { name: /sort by/i }),
-      "sacrifice",
-    );
-    expect(onUpdate).toHaveBeenCalledWith({ sort: "sacrifice" });
+    render(<FilterPanel {...defaultProps} onUpdate={onUpdate} />);
+    await userEvent.click(screen.getByRole("button", { name: /blitz/i }));
+    expect(onUpdate).toHaveBeenCalledWith({ timeControl: "Blitz" });
   });
 });
