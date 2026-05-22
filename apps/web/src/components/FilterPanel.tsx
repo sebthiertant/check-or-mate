@@ -20,10 +20,10 @@ interface FilterPanelProps {
 }
 
 const TIME_CONTROLS: { value: TimeControl; label: string }[] = [
-  { value: "all",    label: "Toutes" },
+  { value: "all", label: "Toutes" },
   { value: "Bullet", label: "Bullet" },
-  { value: "Blitz",  label: "Blitz" },
-  { value: "Rapid",  label: "Rapid" },
+  { value: "Blitz", label: "Blitz" },
+  { value: "Rapid", label: "Rapid" },
 ];
 
 export function FilterPanel({
@@ -70,11 +70,16 @@ export function FilterPanel({
       >
         <div className="p-4 flex flex-col gap-0">
           {/* Header de la sidebar */}
-          <div className="flex items-center justify-between mb-4 sticky top-0 py-1"
-            style={{ background: "var(--panel)", zIndex: 1 }}>
+          <div
+            className="flex items-center justify-between mb-4 sticky top-0 py-1"
+            style={{ background: "var(--panel)", zIndex: 1 }}
+          >
             <div className="flex items-center gap-2">
               <span style={{ color: "var(--text-dim)" }}>⫶</span>
-              <span className="section-label" style={{ color: "var(--text-muted)" }}>
+              <span
+                className="section-label"
+                style={{ color: "var(--text-muted)" }}
+              >
                 Filtres
               </span>
             </div>
@@ -83,8 +88,12 @@ export function FilterPanel({
                 onClick={onReset}
                 className="font-mono text-[11px] transition-colors"
                 style={{ color: "var(--text-dim)" }}
-                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
-                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-dim)"; }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = "var(--accent)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = "var(--text-dim)";
+                }}
               >
                 Réinitialiser
               </button>
@@ -100,7 +109,10 @@ export function FilterPanel({
           </div>
 
           {/* Seuils par dimension */}
-          <section className="py-4" style={{ borderTop: "1px dashed var(--border)" }}>
+          <section
+            className="py-4"
+            style={{ borderTop: "1px dashed var(--border)" }}
+          >
             <div className="section-label mb-3">Seuils par dimension</div>
             <div className="flex flex-col gap-3">
               {SCORE_DIMENSIONS.map((dim) => (
@@ -116,7 +128,10 @@ export function FilterPanel({
           </section>
 
           {/* Cadence */}
-          <section className="py-4" style={{ borderTop: "1px dashed var(--border)" }}>
+          <section
+            className="py-4"
+            style={{ borderTop: "1px dashed var(--border)" }}
+          >
             <div className="section-label mb-3">Cadence</div>
             <div
               className="flex rounded-lg overflow-hidden"
@@ -147,7 +162,10 @@ export function FilterPanel({
           </section>
 
           {/* Joueurs */}
-          <section className="py-4" style={{ borderTop: "1px dashed var(--border)" }}>
+          <section
+            className="py-4"
+            style={{ borderTop: "1px dashed var(--border)" }}
+          >
             <div className="flex items-center gap-2 mb-3">
               <span className="section-label">Joueurs</span>
               {filters.players.length > 0 && (

@@ -61,8 +61,14 @@ export function FilteredPage({ games }: FilteredPageProps) {
 
   // selectedId — persisted in URL as `sel`
   const rawSel = searchParams.get("sel");
-  const filteredGames = useMemo(() => filterGames(games, filters), [games, filters]);
-  const sortedGames = useMemo(() => sortGames(filteredGames, filters.sort), [filteredGames, filters.sort]);
+  const filteredGames = useMemo(
+    () => filterGames(games, filters),
+    [games, filters],
+  );
+  const sortedGames = useMemo(
+    () => sortGames(filteredGames, filters.sort),
+    [filteredGames, filters.sort],
+  );
 
   const defaultId = sortedGames[0]?.id ?? games[0]?.id ?? null;
   const selectedId = rawSel ?? defaultId;
@@ -91,7 +97,9 @@ export function FilteredPage({ games }: FilteredPageProps) {
       setPage(1);
       const next = serializeFilters({ ...filters, ...updates });
       const sel = selectedId ? `&sel=${selectedId}` : "";
-      router.replace(next ? `${pathname}?${next}${sel}` : pathname, { scroll: false });
+      router.replace(next ? `${pathname}?${next}${sel}` : pathname, {
+        scroll: false,
+      });
     },
     [filters, pathname, router, selectedId],
   );
@@ -108,7 +116,10 @@ export function FilteredPage({ games }: FilteredPageProps) {
       router.replace(next, { scroll: false });
       setMoveIdx(0);
       // On mobile, open the detail drawer
-      if (typeof window !== "undefined" && window.matchMedia("(max-width: 1099px)").matches) {
+      if (
+        typeof window !== "undefined" &&
+        window.matchMedia("(max-width: 1099px)").matches
+      ) {
         setDetailOpenMobile(true);
       }
     },
@@ -139,15 +150,13 @@ export function FilteredPage({ games }: FilteredPageProps) {
   const pagedGames = sortedGames.slice(pageStart, pageStart + PAGE_SIZE);
 
   // Active filter count (for badge)
-  const activeFilterCount =
-    Object.entries(filters)
-      .filter(([k, v]) => {
-        if (k === "sort") return v !== "overall";
-        if (k === "players") return (v as string[]).length > 0;
-        if (k === "timeControl") return v !== "all";
-        if (k === "search") return (v as string).trim().length > 0;
-        return (v as number) > 0;
-      }).length;
+  const activeFilterCount = Object.entries(filters).filter(([k, v]) => {
+    if (k === "sort") return v !== "overall";
+    if (k === "players") return (v as string[]).length > 0;
+    if (k === "timeControl") return v !== "all";
+    if (k === "search") return (v as string).trim().length > 0;
+    return (v as number) > 0;
+  }).length;
 
   return (
     <>
@@ -155,7 +164,9 @@ export function FilteredPage({ games }: FilteredPageProps) {
         gamesShown={sortedGames.length}
         totalGames={games.length}
         sort={filters.sort}
-        onSortChange={(sort) => updateFilters({ sort: sort as Filters["sort"] })}
+        onSortChange={(sort) =>
+          updateFilters({ sort: sort as Filters["sort"] })
+        }
         search={filters.search}
         onSearchChange={(search) => updateFilters({ search })}
         onOpenFilters={() => setFiltersOpen(true)}
@@ -275,7 +286,10 @@ function Pagination({ page, totalPages, onPageChange }: PaginationProps) {
       >
         ← Précédent
       </button>
-      <span className="font-mono text-[12px] tabular-nums" style={{ color: "var(--text-dim)" }}>
+      <span
+        className="font-mono text-[12px] tabular-nums"
+        style={{ color: "var(--text-dim)" }}
+      >
         {page} / {totalPages}
       </span>
       <button

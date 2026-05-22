@@ -46,7 +46,10 @@ function moveLabel(moves: Move[], index: number): string {
 }
 
 const TIME_CLASS_LABEL: Record<Game["time_class"], string> = {
-  bullet: "Bullet", blitz: "Blitz", rapid: "Rapid", classical: "Classical",
+  bullet: "Bullet",
+  blitz: "Blitz",
+  rapid: "Rapid",
+  classical: "Classical",
 };
 
 export function DetailPanel({
@@ -77,7 +80,10 @@ export function DetailPanel({
           borderLeft: "1px solid var(--border)",
         }}
       >
-        <p className="font-mono text-[12px]" style={{ color: "var(--text-dim)" }}>
+        <p
+          className="font-mono text-[12px]"
+          style={{ color: "var(--text-dim)" }}
+        >
           Sélectionnez une partie
         </p>
       </aside>
@@ -104,16 +110,29 @@ export function DetailPanel({
               style={{ color: "var(--text)" }}
             >
               <span>{game.white}</span>
-              <span className="text-[12px]" style={{ color: "var(--text-dim)" }}>vs</span>
+              <span
+                className="text-[12px]"
+                style={{ color: "var(--text-dim)" }}
+              >
+                vs
+              </span>
               <span>{game.black}</span>
             </div>
-            <div className="font-mono text-[11px]" style={{ color: "var(--text-muted)" }}>
-              <code>{game.eco}</code> · {game.opening_name} · {TIME_CLASS_LABEL[game.time_class]} · {formatDate(game.date)}
+            <div
+              className="font-mono text-[11px]"
+              style={{ color: "var(--text-muted)" }}
+            >
+              <code>{game.eco}</code> · {game.opening_name} ·{" "}
+              {TIME_CLASS_LABEL[game.time_class]} · {formatDate(game.date)}
             </div>
           </div>
           <div className="flex items-center gap-1 shrink-0 ml-2">
-            <CtrlButton onClick={onOpenFullscreen} title="Plein écran">⛶</CtrlButton>
-            <CtrlButton onClick={onClose} title="Fermer" className="lg:hidden">×</CtrlButton>
+            <CtrlButton onClick={onOpenFullscreen} title="Plein écran">
+              ⛶
+            </CtrlButton>
+            <CtrlButton onClick={onClose} title="Fermer" className="lg:hidden">
+              ×
+            </CtrlButton>
           </div>
         </div>
 
@@ -139,7 +158,10 @@ export function DetailPanel({
               customLightSquareStyle={{ backgroundColor: "var(--sq-light)" }}
             />
           </div>
-          <div className="eval-rail" style={{ height: "auto", alignSelf: "stretch" }}>
+          <div
+            className="eval-rail"
+            style={{ height: "auto", alignSelf: "stretch" }}
+          >
             <div className="eval-fill" style={{ height: `${evalFill}%` }} />
           </div>
         </div>
@@ -147,16 +169,44 @@ export function DetailPanel({
         {/* Contrôles */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-1">
-            <CtrlButton onClick={() => onMoveIdx(0)} title="Début (Home)" disabled={clampedIdx === 0}>⏮</CtrlButton>
-            <CtrlButton onClick={() => onMoveIdx(Math.max(0, clampedIdx - 1))} title="← Précédent" disabled={clampedIdx === 0}>◀</CtrlButton>
+            <CtrlButton
+              onClick={() => onMoveIdx(0)}
+              title="Début (Home)"
+              disabled={clampedIdx === 0}
+            >
+              ⏮
+            </CtrlButton>
+            <CtrlButton
+              onClick={() => onMoveIdx(Math.max(0, clampedIdx - 1))}
+              title="← Précédent"
+              disabled={clampedIdx === 0}
+            >
+              ◀
+            </CtrlButton>
             <span
               className="px-2 font-mono text-[11px] tabular-nums"
-              style={{ color: "var(--text-muted)", minWidth: "80px", textAlign: "center" }}
+              style={{
+                color: "var(--text-muted)",
+                minWidth: "80px",
+                textAlign: "center",
+              }}
             >
               {label}
             </span>
-            <CtrlButton onClick={() => onMoveIdx(Math.min(totalMoves, clampedIdx + 1))} title="→ Suivant" disabled={clampedIdx === totalMoves}>▶</CtrlButton>
-            <CtrlButton onClick={() => onMoveIdx(totalMoves)} title="Fin (End)" disabled={clampedIdx === totalMoves}>⏭</CtrlButton>
+            <CtrlButton
+              onClick={() => onMoveIdx(Math.min(totalMoves, clampedIdx + 1))}
+              title="→ Suivant"
+              disabled={clampedIdx === totalMoves}
+            >
+              ▶
+            </CtrlButton>
+            <CtrlButton
+              onClick={() => onMoveIdx(totalMoves)}
+              title="Fin (End)"
+              disabled={clampedIdx === totalMoves}
+            >
+              ⏭
+            </CtrlButton>
           </div>
           <button
             onClick={onFlip}
@@ -173,11 +223,16 @@ export function DetailPanel({
         </div>
 
         {/* Toutes les dimensions */}
-        <section className="py-4" style={{ borderTop: "1px solid var(--border)" }}>
+        <section
+          className="py-4"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
           <div className="flex items-center justify-between mb-3">
             <span className="section-label">Toutes les dimensions</span>
             <span className="font-mono text-[12px]">
-              <strong style={{ color: "var(--accent)" }}>{game.scores.overall}</strong>
+              <strong style={{ color: "var(--accent)" }}>
+                {game.scores.overall}
+              </strong>
               <span style={{ color: "var(--text-dim)" }}> /100</span>
             </span>
           </div>
@@ -193,20 +248,29 @@ export function DetailPanel({
         </section>
 
         {/* Stats */}
-        <section className="py-4" style={{ borderTop: "1px solid var(--border)" }}>
+        <section
+          className="py-4"
+          style={{ borderTop: "1px solid var(--border)" }}
+        >
           <div className="section-label mb-3">Données</div>
           <div className="grid grid-cols-2 gap-x-4 gap-y-2">
             {[
-              { label: "Coups",     value: game.scores.overall },
-              { label: "Résultat",  value: game.result },
-              { label: "Cadence",   value: TIME_CLASS_LABEL[game.time_class] },
+              { label: "Coups", value: game.scores.overall },
+              { label: "Résultat", value: game.result },
+              { label: "Cadence", value: TIME_CLASS_LABEL[game.time_class] },
               { label: "Ouverture", value: game.opening_name },
             ].map(({ label, value }) => (
               <div key={label} className="flex flex-col gap-0.5">
-                <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: "var(--text-dim)" }}>
+                <span
+                  className="font-mono text-[10px] uppercase tracking-wider"
+                  style={{ color: "var(--text-dim)" }}
+                >
                   {label}
                 </span>
-                <span className="font-mono text-[12px]" style={{ color: "var(--text-muted)" }}>
+                <span
+                  className="font-mono text-[12px]"
+                  style={{ color: "var(--text-muted)" }}
+                >
                   {value}
                 </span>
               </div>
@@ -242,9 +306,15 @@ export function DetailPanel({
           className="flex items-center justify-center gap-4 mt-4 font-mono text-[10px]"
           style={{ color: "var(--text-dim)" }}
         >
-          <span><Kbd>←</Kbd> <Kbd>→</Kbd> coups</span>
-          <span><Kbd>F</Kbd> retourner</span>
-          <span><Kbd>⛶</Kbd> plein écran</span>
+          <span>
+            <Kbd>←</Kbd> <Kbd>→</Kbd> coups
+          </span>
+          <span>
+            <Kbd>F</Kbd> retourner
+          </span>
+          <span>
+            <Kbd>⛶</Kbd> plein écran
+          </span>
         </div>
       </div>
     </aside>
@@ -285,7 +355,11 @@ function Kbd({ children }: { children: React.ReactNode }) {
   return (
     <kbd
       className="inline-flex items-center justify-center px-1 rounded font-mono text-[9px]"
-      style={{ background: "var(--panel-3)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
+      style={{
+        background: "var(--panel-3)",
+        border: "1px solid var(--border)",
+        color: "var(--text-muted)",
+      }}
     >
       {children}
     </kbd>

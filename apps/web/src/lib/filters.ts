@@ -33,17 +33,17 @@ export const SORT_KEYS = [
 ] as const satisfies readonly SortKey[];
 
 export const DEFAULT_FILTERS: Filters = {
-  sacrifice:       0,
-  eval_swing:      0,
-  brilliancy:      0,
-  time_pressure:   0,
+  sacrifice: 0,
+  eval_swing: 0,
+  brilliancy: 0,
+  time_pressure: 0,
   endgame_quality: 0,
-  rating_upset:    0,
-  opening_rarity:  0,
-  sort:            "overall",
-  players:         [],
-  timeControl:     "all",
-  search:          "",
+  rating_upset: 0,
+  opening_rarity: 0,
+  sort: "overall",
+  players: [],
+  timeControl: "all",
+  search: "",
 };
 
 const TIME_CONTROL_VALUES: TimeControl[] = ["all", "Bullet", "Blitz", "Rapid"];
@@ -93,7 +93,8 @@ export function serializeFilters(filters: Filters): string {
   }
 
   if (filters.sort !== "overall") params.set("sort", filters.sort);
-  if (filters.players.length > 0) params.set("players", filters.players.join(","));
+  if (filters.players.length > 0)
+    params.set("players", filters.players.join(","));
   if (filters.timeControl !== "all") params.set("tc", filters.timeControl);
   if (filters.search.trim()) params.set("q", filters.search.trim());
 
@@ -109,7 +110,11 @@ export function filterGames(games: Game[], filters: Filters): Game[] {
     if (filters.players.length > 0) {
       const wl = game.white.toLowerCase();
       const bl = game.black.toLowerCase();
-      if (!filters.players.some((p) => p.toLowerCase() === wl || p.toLowerCase() === bl)) {
+      if (
+        !filters.players.some(
+          (p) => p.toLowerCase() === wl || p.toLowerCase() === bl,
+        )
+      ) {
         return false;
       }
     }
@@ -127,7 +132,8 @@ export function filterGames(games: Game[], filters: Filters): Game[] {
 
     // Free text search
     if (q) {
-      const hay = `${game.white} ${game.black} ${game.eco} ${game.opening_name}`.toLowerCase();
+      const hay =
+        `${game.white} ${game.black} ${game.eco} ${game.opening_name}`.toLowerCase();
       if (!hay.includes(q)) return false;
     }
 

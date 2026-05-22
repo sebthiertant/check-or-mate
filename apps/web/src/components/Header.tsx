@@ -14,14 +14,14 @@ interface HeaderProps {
 }
 
 const SORT_OPTIONS = [
-  { value: "overall",         label: "Score global" },
-  { value: "sacrifice",       label: "Sacrifice" },
-  { value: "eval_swing",      label: "Drama" },
-  { value: "brilliancy",      label: "Brilliancy" },
-  { value: "time_pressure",   label: "Clock pressure" },
+  { value: "overall", label: "Score global" },
+  { value: "sacrifice", label: "Sacrifice" },
+  { value: "eval_swing", label: "Drama" },
+  { value: "brilliancy", label: "Brilliancy" },
+  { value: "time_pressure", label: "Clock pressure" },
   { value: "endgame_quality", label: "Endgame" },
-  { value: "rating_upset",    label: "Upset" },
-  { value: "opening_rarity",  label: "Rarity" },
+  { value: "rating_upset", label: "Upset" },
+  { value: "opening_rarity", label: "Rarity" },
 ];
 
 export function Header({
@@ -73,7 +73,11 @@ export function Header({
           {/* Search */}
           <div
             className="relative flex-1"
-            style={{ maxWidth: "520px", marginLeft: "auto", marginRight: "auto" }}
+            style={{
+              maxWidth: "520px",
+              marginLeft: "auto",
+              marginRight: "auto",
+            }}
           >
             <span
               className="absolute left-3 top-1/2 -translate-y-1/2 text-[14px] pointer-events-none select-none"
@@ -93,8 +97,12 @@ export function Header({
                 color: "var(--text)",
                 outline: "none",
               }}
-              onFocus={(e) => { e.currentTarget.style.borderColor = "var(--accent-line)"; }}
-              onBlur={(e) => { e.currentTarget.style.borderColor = "var(--border)"; }}
+              onFocus={(e) => {
+                e.currentTarget.style.borderColor = "var(--accent-line)";
+              }}
+              onBlur={(e) => {
+                e.currentTarget.style.borderColor = "var(--border)";
+              }}
             />
             {search && (
               <button
@@ -114,9 +122,11 @@ export function Header({
             <button
               className="lg:hidden flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg font-mono text-[12px] transition-colors"
               style={{
-                background: activeFilterCount > 0 ? "var(--accent-soft)" : "var(--panel)",
+                background:
+                  activeFilterCount > 0 ? "var(--accent-soft)" : "var(--panel)",
                 border: `1px solid ${activeFilterCount > 0 ? "var(--accent-line)" : "var(--border)"}`,
-                color: activeFilterCount > 0 ? "var(--accent)" : "var(--text-muted)",
+                color:
+                  activeFilterCount > 0 ? "var(--accent)" : "var(--text-muted)",
               }}
               onClick={onOpenFilters}
             >
@@ -134,7 +144,10 @@ export function Header({
 
             {/* Sort selector */}
             <div className="flex items-center gap-1.5">
-              <span className="font-mono text-[11px] hidden sm:block" style={{ color: "var(--text-dim)" }}>
+              <span
+                className="font-mono text-[11px] hidden sm:block"
+                style={{ color: "var(--text-dim)" }}
+              >
                 Tri
               </span>
               <select
@@ -167,7 +180,9 @@ export function Header({
               }}
             >
               <span>{linkCopied ? "✓" : "⎘"}</span>
-              <span className="hidden sm:inline">{linkCopied ? "Copié" : "Copier le lien"}</span>
+              <span className="hidden sm:inline">
+                {linkCopied ? "Copié" : "Copier le lien"}
+              </span>
             </button>
           </div>
         </div>
@@ -183,9 +198,16 @@ export function Header({
           <strong style={{ color: "var(--text-muted)" }}>7</strong>
           <span>dimensions</span>
           <span className="mx-1">·</span>
-          <code className="font-mono text-[10px]" style={{ color: "var(--text-muted)" }}>Stockfish 16</code>
+          <code
+            className="font-mono text-[10px]"
+            style={{ color: "var(--text-muted)" }}
+          >
+            Stockfish 16
+          </code>
           <span className="mx-1">·</span>
-          <em style={{ color: "var(--text-dim)" }}>Curé automatiquement depuis chess.com</em>
+          <em style={{ color: "var(--text-dim)" }}>
+            Curé automatiquement depuis chess.com
+          </em>
         </div>
       </div>
     </header>

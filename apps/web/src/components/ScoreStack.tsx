@@ -34,7 +34,10 @@ export function ScoreStack({ scores }: ScoreStackProps) {
         {SCORE_DIMENSIONS.map((dim, i) => {
           const hue = i * (360 / SCORE_DIMENSIONS.length);
           return (
-            <span key={dim} className="flex items-center gap-1 font-mono text-[10px] text-[var(--text-muted)]">
+            <span
+              key={dim}
+              className="flex items-center gap-1 font-mono text-[10px] text-[var(--text-muted)]"
+            >
               <span
                 className="w-1.5 h-1.5 rounded-full shrink-0"
                 style={{ background: `oklch(0.68 0.12 ${hue})` }}

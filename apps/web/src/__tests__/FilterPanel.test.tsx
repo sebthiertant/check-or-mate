@@ -19,7 +19,9 @@ describe("FilterPanel", () => {
   it("renders a labeled slider for each dimension", () => {
     render(<FilterPanel {...defaultProps} />);
     for (const label of Object.values(DIMENSION_LABELS)) {
-      expect(screen.getByLabelText(`Seuil minimum ${label}`)).toBeInTheDocument();
+      expect(
+        screen.getByLabelText(`Seuil minimum ${label}`),
+      ).toBeInTheDocument();
     }
   });
 
@@ -30,13 +32,17 @@ describe("FilterPanel", () => {
 
   it("shows the Réinitialiser button", () => {
     render(<FilterPanel {...defaultProps} />);
-    expect(screen.getByRole("button", { name: /réinitialiser/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: /réinitialiser/i }),
+    ).toBeInTheDocument();
   });
 
   it("calls onReset when Réinitialiser is clicked", async () => {
     const onReset = vi.fn();
     render(<FilterPanel {...defaultProps} onReset={onReset} />);
-    await userEvent.click(screen.getByRole("button", { name: /réinitialiser/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /réinitialiser/i }),
+    );
     expect(onReset).toHaveBeenCalledOnce();
   });
 

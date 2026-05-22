@@ -11,9 +11,9 @@ import { ScoreStack } from "./ScoreStack";
 import { formatDate } from "@/lib/utils";
 
 const TIME_CLASS_LABEL: Record<Game["time_class"], string> = {
-  bullet:    "Bullet",
-  blitz:     "Blitz",
-  rapid:     "Rapid",
+  bullet: "Bullet",
+  blitz: "Blitz",
+  rapid: "Rapid",
   classical: "Classical",
 };
 
@@ -44,10 +44,13 @@ export function GameCard({ game, rank, selected, onClick }: GameCardProps) {
       }}
       onClick={onClick}
       tabIndex={0}
-      onKeyDown={(e) => { if (e.key === "Enter") onClick(); }}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") onClick();
+      }}
       onMouseEnter={(e) => {
         if (!selected) {
-          (e.currentTarget as HTMLElement).style.borderColor = "var(--border-strong)";
+          (e.currentTarget as HTMLElement).style.borderColor =
+            "var(--border-strong)";
           (e.currentTarget as HTMLElement).style.background = "var(--panel-2)";
         }
       }}
@@ -70,19 +73,42 @@ export function GameCard({ game, rank, selected, onClick }: GameCardProps) {
       <div className="min-w-0 flex flex-col gap-1.5">
         {/* Players */}
         <div className="flex items-baseline gap-1.5 flex-wrap">
-          <span className="w-2 h-2 rounded-sm shrink-0 inline-block self-center" style={{ background: "#e9e5dc" }} />
-          <span className="font-mono font-semibold text-[14px]" style={{ color: "var(--text)" }}>
+          <span
+            className="w-2 h-2 rounded-sm shrink-0 inline-block self-center"
+            style={{ background: "#e9e5dc" }}
+          />
+          <span
+            className="font-mono font-semibold text-[14px]"
+            style={{ color: "var(--text)" }}
+          >
             {game.white}
           </span>
-          <span className="font-mono text-[11px] tabular-nums" style={{ color: "var(--text-muted)" }}>
+          <span
+            className="font-mono text-[11px] tabular-nums"
+            style={{ color: "var(--text-muted)" }}
+          >
             {game.white_rating}
           </span>
-          <span className="font-mono text-[11px]" style={{ color: "var(--text-dim)" }}>vs</span>
-          <span className="w-2 h-2 rounded-sm shrink-0 inline-block self-center" style={{ background: "#3a342d" }} />
-          <span className="font-mono font-semibold text-[14px]" style={{ color: "var(--text)" }}>
+          <span
+            className="font-mono text-[11px]"
+            style={{ color: "var(--text-dim)" }}
+          >
+            vs
+          </span>
+          <span
+            className="w-2 h-2 rounded-sm shrink-0 inline-block self-center"
+            style={{ background: "#3a342d" }}
+          />
+          <span
+            className="font-mono font-semibold text-[14px]"
+            style={{ color: "var(--text)" }}
+          >
             {game.black}
           </span>
-          <span className="font-mono text-[11px] tabular-nums" style={{ color: "var(--text-muted)" }}>
+          <span
+            className="font-mono text-[11px] tabular-nums"
+            style={{ color: "var(--text-muted)" }}
+          >
             {game.black_rating}
           </span>
         </div>
@@ -90,16 +116,40 @@ export function GameCard({ game, rank, selected, onClick }: GameCardProps) {
         {/* Meta */}
         <div className="flex items-center gap-1.5 flex-wrap">
           <ResultBadge result={game.result} />
-          <span className="font-mono text-[11px]" style={{ color: "var(--text-dim)" }}>·</span>
-          <span className="font-mono text-[11px]" style={{ color: "var(--text-muted)" }}>
+          <span
+            className="font-mono text-[11px]"
+            style={{ color: "var(--text-dim)" }}
+          >
+            ·
+          </span>
+          <span
+            className="font-mono text-[11px]"
+            style={{ color: "var(--text-muted)" }}
+          >
             {TIME_CLASS_LABEL[game.time_class]}
           </span>
-          <span className="font-mono text-[11px]" style={{ color: "var(--text-dim)" }}>·</span>
-          <code className="font-mono text-[11px]" style={{ color: "var(--text-muted)" }}>
+          <span
+            className="font-mono text-[11px]"
+            style={{ color: "var(--text-dim)" }}
+          >
+            ·
+          </span>
+          <code
+            className="font-mono text-[11px]"
+            style={{ color: "var(--text-muted)" }}
+          >
             {game.eco}
           </code>
-          <span className="font-mono text-[11px]" style={{ color: "var(--text-dim)" }}>·</span>
-          <span className="font-mono text-[11px]" style={{ color: "var(--text-dim)" }}>
+          <span
+            className="font-mono text-[11px]"
+            style={{ color: "var(--text-dim)" }}
+          >
+            ·
+          </span>
+          <span
+            className="font-mono text-[11px]"
+            style={{ color: "var(--text-dim)" }}
+          >
             {formatDate(game.date)}
           </span>
         </div>

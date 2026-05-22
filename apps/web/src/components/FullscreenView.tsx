@@ -45,7 +45,10 @@ function moveLabel(moves: Move[], index: number): string {
 }
 
 const TIME_CLASS_LABEL: Record<Game["time_class"], string> = {
-  bullet: "Bullet", blitz: "Blitz", rapid: "Rapid", classical: "Classical",
+  bullet: "Bullet",
+  blitz: "Blitz",
+  rapid: "Rapid",
+  classical: "Classical",
 };
 
 export function FullscreenView({
@@ -61,13 +64,18 @@ export function FullscreenView({
   const clamped = Math.min(moveIdx, totalMoves);
   const position = useMemo(() => positionAt(moves, clamped), [moves, clamped]);
   const label = moveLabel(moves, clamped);
-  const evalFill = Math.min(100, Math.max(0, 50 + (game.scores.eval_swing ?? 50) * 0.5));
+  const evalFill = Math.min(
+    100,
+    Math.max(0, 50 + (game.scores.eval_swing ?? 50) * 0.5),
+  );
 
   // Lock body scroll
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, []);
 
   return (
@@ -90,8 +98,12 @@ export function FullscreenView({
           onClick={onClose}
           className="flex items-center gap-2 font-mono text-[12px] transition-colors"
           style={{ color: "var(--text-muted)" }}
-          onMouseEnter={(e) => { e.currentTarget.style.color = "var(--text)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-muted)"; }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.color = "var(--text)";
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.color = "var(--text-muted)";
+          }}
         >
           <span>←</span>
           <span>Retour à la liste</span>
@@ -102,12 +114,17 @@ export function FullscreenView({
           <div className="eyebrow">
             Partie n°{String(game.scores.overall).padStart(2, "0")}
           </div>
-          <div className="font-mono font-semibold text-[18px] flex items-baseline gap-2" style={{ color: "var(--text)" }}>
+          <div
+            className="font-mono font-semibold text-[18px] flex items-baseline gap-2"
+            style={{ color: "var(--text)" }}
+          >
             <span>{game.white}</span>
             <span className="text-[12px]" style={{ color: "var(--text-dim)" }}>
               {game.white_rating}
             </span>
-            <span className="text-[14px]" style={{ color: "var(--text-dim)" }}>vs</span>
+            <span className="text-[14px]" style={{ color: "var(--text-dim)" }}>
+              vs
+            </span>
             <span>{game.black}</span>
             <span className="text-[12px]" style={{ color: "var(--text-dim)" }}>
               {game.black_rating}
@@ -155,7 +172,8 @@ export function FullscreenView({
         <section
           className="flex flex-col flex-1 items-center justify-center p-6 gap-4"
           style={{
-            background: "radial-gradient(ellipse at center, rgba(245,165,36,0.04) 0%, transparent 70%)",
+            background:
+              "radial-gradient(ellipse at center, rgba(245,165,36,0.04) 0%, transparent 70%)",
           }}
         >
           <div
@@ -183,7 +201,8 @@ export function FullscreenView({
                 arePiecesDraggable={false}
                 customBoardStyle={{
                   borderRadius: "8px",
-                  boxShadow: "0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.4)",
+                  boxShadow:
+                    "0 30px 80px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(0,0,0,0.4)",
                 }}
                 customDarkSquareStyle={{ backgroundColor: "var(--sq-dark)" }}
                 customLightSquareStyle={{ backgroundColor: "var(--sq-light)" }}
@@ -195,7 +214,10 @@ export function FullscreenView({
           {totalMoves > 0 && (
             <div
               className="relative h-2 rounded-full overflow-hidden w-full"
-              style={{ maxWidth: "min(75vh, 720px)", background: "var(--panel-3)" }}
+              style={{
+                maxWidth: "min(75vh, 720px)",
+                background: "var(--panel-3)",
+              }}
             >
               <div
                 className="absolute inset-y-0 left-0 rounded-full transition-[width] duration-150"
@@ -216,9 +238,14 @@ export function FullscreenView({
                     <span
                       className="absolute w-1.5 h-1.5 rounded-full transition-all duration-100"
                       style={{
-                        background: i + 1 <= clamped ? "var(--accent)" : "var(--panel-2)",
-                        transform: i + 1 === clamped ? "scale(1.5)" : "scale(1)",
-                        boxShadow: i + 1 === clamped ? "0 0 0 3px var(--accent-soft)" : "none",
+                        background:
+                          i + 1 <= clamped ? "var(--accent)" : "var(--panel-2)",
+                        transform:
+                          i + 1 === clamped ? "scale(1.5)" : "scale(1)",
+                        boxShadow:
+                          i + 1 === clamped
+                            ? "0 0 0 3px var(--accent-soft)"
+                            : "none",
                       }}
                     />
                   </button>
@@ -232,7 +259,10 @@ export function FullscreenView({
             className="flex items-center justify-between w-full"
             style={{ maxWidth: "min(75vh, 720px)" }}
           >
-            <div className="flex items-center gap-2 font-mono text-[11px]" style={{ color: "var(--text-muted)" }}>
+            <div
+              className="flex items-center gap-2 font-mono text-[11px]"
+              style={{ color: "var(--text-muted)" }}
+            >
               <span>{label}</span>
               {totalMoves > 0 && (
                 <span style={{ color: "var(--text-dim)" }}>
@@ -241,12 +271,41 @@ export function FullscreenView({
               )}
             </div>
             <div className="flex items-center gap-1">
-              <FsCtrl onClick={() => onMoveIdx(0)} title="Début" disabled={clamped === 0}>⏮</FsCtrl>
-              <FsCtrl onClick={() => onMoveIdx(Math.max(0, clamped - 1))} title="Précédent (←)" disabled={clamped === 0}>◀</FsCtrl>
-              <FsCtrl onClick={() => onMoveIdx(Math.min(totalMoves, clamped + 1))} title="Suivant (→)" disabled={clamped === totalMoves}>▶</FsCtrl>
-              <FsCtrl onClick={() => onMoveIdx(totalMoves)} title="Fin" disabled={clamped === totalMoves}>⏭</FsCtrl>
-              <div className="w-px h-5 mx-1" style={{ background: "var(--border)" }} />
-              <FsCtrl onClick={onFlip} title="Retourner (F)">⇅</FsCtrl>
+              <FsCtrl
+                onClick={() => onMoveIdx(0)}
+                title="Début"
+                disabled={clamped === 0}
+              >
+                ⏮
+              </FsCtrl>
+              <FsCtrl
+                onClick={() => onMoveIdx(Math.max(0, clamped - 1))}
+                title="Précédent (←)"
+                disabled={clamped === 0}
+              >
+                ◀
+              </FsCtrl>
+              <FsCtrl
+                onClick={() => onMoveIdx(Math.min(totalMoves, clamped + 1))}
+                title="Suivant (→)"
+                disabled={clamped === totalMoves}
+              >
+                ▶
+              </FsCtrl>
+              <FsCtrl
+                onClick={() => onMoveIdx(totalMoves)}
+                title="Fin"
+                disabled={clamped === totalMoves}
+              >
+                ⏭
+              </FsCtrl>
+              <div
+                className="w-px h-5 mx-1"
+                style={{ background: "var(--border)" }}
+              />
+              <FsCtrl onClick={onFlip} title="Retourner (F)">
+                ⇅
+              </FsCtrl>
             </div>
           </div>
         </section>
@@ -268,8 +327,12 @@ export function FullscreenView({
             >
               {game.scores.overall}
             </div>
-            <div className="font-mono text-[11px]" style={{ color: "var(--text-dim)" }}>
-              score global<br />
+            <div
+              className="font-mono text-[11px]"
+              style={{ color: "var(--text-dim)" }}
+            >
+              score global
+              <br />
               <em>curated by machine</em>
             </div>
           </div>
@@ -293,17 +356,23 @@ export function FullscreenView({
             <div className="section-label mb-3">Données</div>
             <div className="grid grid-cols-2 gap-x-4 gap-y-3">
               {[
-                { label: "Résultat",  value: game.result },
-                { label: "Cadence",   value: TIME_CLASS_LABEL[game.time_class] },
+                { label: "Résultat", value: game.result },
+                { label: "Cadence", value: TIME_CLASS_LABEL[game.time_class] },
                 { label: "Ouverture", value: game.opening_name },
-                { label: "ECO",       value: game.eco },
-                { label: "Date",      value: formatDate(game.date) },
+                { label: "ECO", value: game.eco },
+                { label: "Date", value: formatDate(game.date) },
               ].map(({ label, value }) => (
                 <div key={label} className="flex flex-col gap-0.5">
-                  <span className="font-mono text-[10px] uppercase tracking-wider" style={{ color: "var(--text-dim)" }}>
+                  <span
+                    className="font-mono text-[10px] uppercase tracking-wider"
+                    style={{ color: "var(--text-dim)" }}
+                  >
                     {label}
                   </span>
-                  <span className="font-mono text-[12px]" style={{ color: "var(--text-muted)" }}>
+                  <span
+                    className="font-mono text-[12px]"
+                    style={{ color: "var(--text-muted)" }}
+                  >
                     {String(value)}
                   </span>
                 </div>
@@ -317,9 +386,15 @@ export function FullscreenView({
             style={{ color: "var(--text-dim)" }}
           >
             <div className="section-label mb-1">Raccourcis</div>
-            <span><Kbd>←</Kbd> <Kbd>→</Kbd> coups</span>
-            <span><Kbd>F</Kbd> retourner</span>
-            <span><Kbd>Esc</Kbd> fermer</span>
+            <span>
+              <Kbd>←</Kbd> <Kbd>→</Kbd> coups
+            </span>
+            <span>
+              <Kbd>F</Kbd> retourner
+            </span>
+            <span>
+              <Kbd>Esc</Kbd> fermer
+            </span>
           </div>
         </section>
       </div>
@@ -359,7 +434,11 @@ function Kbd({ children }: { children: React.ReactNode }) {
   return (
     <kbd
       className="inline-flex items-center justify-center px-1 rounded font-mono text-[9px]"
-      style={{ background: "var(--panel-3)", border: "1px solid var(--border)", color: "var(--text-muted)" }}
+      style={{
+        background: "var(--panel-3)",
+        border: "1px solid var(--border)",
+        color: "var(--text-muted)",
+      }}
     >
       {children}
     </kbd>

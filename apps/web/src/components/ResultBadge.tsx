@@ -10,7 +10,8 @@ interface ResultBadgeProps {
   result: Result;
 }
 
-const BASE = "inline-flex items-center px-1.5 py-0.5 rounded font-mono text-[11px] font-medium";
+const BASE =
+  "inline-flex items-center px-1.5 py-0.5 rounded font-mono text-[11px] font-medium";
 
 export function ResultBadge({ result }: ResultBadgeProps) {
   if (result === "1-0") {

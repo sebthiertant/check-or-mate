@@ -21,7 +21,10 @@ export function GameList({
   totalGames,
 }: GameListProps) {
   return (
-    <section aria-label="Parties sélectionnées" className="flex flex-col min-h-0">
+    <section
+      aria-label="Parties sélectionnées"
+      className="flex flex-col min-h-0"
+    >
       {/* Toolbar */}
       <div
         className="flex items-center justify-between px-1 py-2 mb-2 font-mono text-[12px]"
@@ -36,8 +39,12 @@ export function GameList({
             onClick={onReset}
             className="transition-colors"
             style={{ color: "var(--text-dim)" }}
-            onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-dim)"; }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.color = "var(--accent)";
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.color = "var(--text-dim)";
+            }}
           >
             Tout afficher
           </button>
@@ -66,8 +73,16 @@ export function GameList({
 function EmptyState({ onReset }: { onReset: () => void }) {
   return (
     <div className="flex flex-col items-center justify-center py-24 text-center gap-4">
-      <div className="font-mono text-[48px]" style={{ color: "var(--text-dim)" }}>∅</div>
-      <p className="font-mono text-[13px]" style={{ color: "var(--text-muted)" }}>
+      <div
+        className="font-mono text-[48px]"
+        style={{ color: "var(--text-dim)" }}
+      >
+        ∅
+      </div>
+      <p
+        className="font-mono text-[13px]"
+        style={{ color: "var(--text-muted)" }}
+      >
         Aucune partie ne passe ces filtres.
       </p>
       <button

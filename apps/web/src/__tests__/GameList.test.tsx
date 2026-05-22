@@ -28,25 +28,32 @@ describe("GameList", () => {
   });
 
   it("shows the empty state message when games array is empty", () => {
+    render(<GameList games={[]} {...defaultProps} totalFiltered={0} />);
+    expect(
+      screen.getByText(/aucune partie ne passe ces filtres/i),
+    ).toBeInTheDocument();
+  });
+
+  it("shows a reset button in the empty state", () => {
+    render(<GameList games={[]} {...defaultProps} totalFiltered={0} />);
+    expect(
+      screen.getByRole("button", { name: /réinitialiser/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("calls onReset when the reset button is clicked in empty state", async () => {
+    const onReset = vi.fn();
     render(
       <GameList
         games={[]}
         {...defaultProps}
         totalFiltered={0}
+        onReset={onReset}
       />,
     );
-    expect(screen.getByText(/aucune partie ne passe ces filtres/i)).toBeInTheDocument();
-  });
-
-  it("shows a reset button in the empty state", () => {
-    render(<GameList games={[]} {...defaultProps} totalFiltered={0} />);
-    expect(screen.getByRole("button", { name: /réinitialiser/i })).toBeInTheDocument();
-  });
-
-  it("calls onReset when the reset button is clicked in empty state", async () => {
-    const onReset = vi.fn();
-    render(<GameList games={[]} {...defaultProps} totalFiltered={0} onReset={onReset} />);
-    await userEvent.click(screen.getByRole("button", { name: /réinitialiser/i }));
+    await userEvent.click(
+      screen.getByRole("button", { name: /réinitialiser/i }),
+    );
     expect(onReset).toHaveBeenCalledOnce();
   });
 

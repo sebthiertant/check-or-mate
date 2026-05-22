@@ -10,13 +10,13 @@ interface ScoreMatrixProps {
 }
 
 const SHORT_LABELS: Record<ScoreDimension, string> = {
-  sacrifice:       "SAC",
-  eval_swing:      "DRM",
-  brilliancy:      "BRI",
-  time_pressure:   "CLK",
+  sacrifice: "SAC",
+  eval_swing: "DRM",
+  brilliancy: "BRI",
+  time_pressure: "CLK",
   endgame_quality: "END",
-  rating_upset:    "UPS",
-  opening_rarity:  "RAR",
+  rating_upset: "UPS",
+  opening_rarity: "RAR",
 };
 
 export function ScoreMatrix({ scores, mini = false }: ScoreMatrixProps) {
@@ -35,9 +35,7 @@ export function ScoreMatrix({ scores, mini = false }: ScoreMatrixProps) {
                 <span
                   key={i}
                   className={`${mini ? "w-1.5 h-1.5" : "w-2 h-2"} rounded-sm transition-colors ${
-                    i < filled
-                      ? "bg-[var(--accent)]"
-                      : "bg-[var(--border)]"
+                    i < filled ? "bg-[var(--accent)]" : "bg-[var(--border)]"
                   }`}
                 />
               ))}
