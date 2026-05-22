@@ -25,6 +25,9 @@ export interface Game {
   date: string;
   pgn?: string;
   scores: Scores;
+  /** Centipawn evaluations (white POV) after each half-move. Index 0 = after move 1.
+   *  Present only when the game was scored with a Stockfish engine. */
+  evaluations?: number[];
 }
 
 export type ScoreDimension = keyof Omit<Scores, "overall">;

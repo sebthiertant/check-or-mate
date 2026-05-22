@@ -64,14 +64,18 @@ def _run_score(
 
     evaluator = _build_evaluator(engine_path) if engine_path else None
     scorer = Scorer(config, evaluator)
-    scores = scorer.score_corpus(records)
+    scored = scorer.score_corpus_with_evals(records)
 
-    paired = sorted(zip(records, scores), key=lambda p: p[1].overall, reverse=True)
+    triplets: list[tuple[GameRecord, NormalizedScores, list[int] | None]] = [
+        (record, normalized, evals)
+        for record, (normalized, evals) in zip(records, scored)
+    ]
+    triplets.sort(key=lambda t: t[1].overall, reverse=True)
     if top_n is not None:
-        paired = paired[:top_n]
+        triplets = triplets[:top_n]
 
     _print_header()
-    for record, normalized in paired:
+    for record, normalized, _ in triplets:
         print(
             f"{record.game_id:<40s}  "
             f"overall={normalized.overall:3d}  "
@@ -81,9 +85,14 @@ def _run_score(
             f"ru={normalized.rating_upset:3d}  "
             f"or={normalized.opening_rarity:3d}"
         )
-    print(f"\n{len(paired)} game(s) written ({len(records)} scored).")
+    print(f"\n{len(triplets)} game(s) written ({len(records)} scored).")
     if output_path:
-        _write_json(output_path, [r for r, _ in paired], [s for _, s in paired])
+        _write_json(
+            output_path,
+            [r for r, _, _ in triplets],
+            [s for _, s, _ in triplets],
+            [e for _, _, e in triplets],
+        )
 
 
 def _build_evaluator(engine_path: str) -> Evaluator:
@@ -93,16 +102,23 @@ def _build_evaluator(engine_path: str) -> Evaluator:
 
 
 def _write_json(
-    output_path: Path, records: list[GameRecord], scores: list[NormalizedScores]
+    output_path: Path,
+    records: list[GameRecord],
+    scores: list[NormalizedScores],
+    evals: list[list[int] | None],
 ) -> None:
     output_path.parent.mkdir(parents=True, exist_ok=True)
-    data = [_to_game_dict(r, s) for r, s in zip(records, scores)]
+    data = [_to_game_dict(r, s, e) for r, s, e in zip(records, scores, evals)]
     output_path.write_text(json.dumps(data, indent=2))
     print(f"Scores written to {output_path}.")
 
 
-def _to_game_dict(record: GameRecord, scores: NormalizedScores) -> dict[str, object]:
-    return {
+def _to_game_dict(
+    record: GameRecord,
+    scores: NormalizedScores,
+    evaluations: list[int] | None,
+) -> dict[str, object]:
+    result: dict[str, object] = {
         "id": record.game_id,
         "white": record.white,
         "black": record.black,
@@ -116,6 +132,9 @@ def _to_game_dict(record: GameRecord, scores: NormalizedScores) -> dict[str, obj
         "pgn": record.pgn,
         "scores": dataclasses.asdict(scores),
     }
+    if evaluations is not None:
+        result["evaluations"] = evaluations
+    return result
 
 
 def _print_header() -> None:

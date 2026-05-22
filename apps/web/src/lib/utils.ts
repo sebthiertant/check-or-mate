@@ -33,3 +33,28 @@ export function formatDate(iso: string): string {
     year: "numeric",
   });
 }
+
+const MATE_SCORE = 30_000;
+
+/**
+ * Convert a centipawn evaluation (white POV) to a 0–100 percentage
+ * for the eval rail (50 = equal, >50 = white winning, <50 = black winning).
+ * Uses a tanh curve so the bar saturates smoothly near ±∞.
+ */
+export function cpToPercent(cp: number): number {
+  if (cp >= MATE_SCORE) return 100;
+  if (cp <= -MATE_SCORE) return 0;
+  return 50 + 50 * Math.tanh(cp / 600);
+}
+
+/**
+ * Format a centipawn value as a human-readable string (+1.5, -2.3, M+, M-).
+ * Returned as e.g. "+1.5", "-2.3", "M+", "M-", "0.0"
+ */
+export function formatCp(cp: number): string {
+  if (cp >= MATE_SCORE) return "M+";
+  if (cp <= -MATE_SCORE) return "M-";
+  const pawns = cp / 100;
+  const sign = pawns > 0 ? "+" : "";
+  return `${sign}${pawns.toFixed(1)}`;
+}
