@@ -44,45 +44,6 @@ function moveLabel(moves: Move[], index: number): string {
   return `${number}${dot} ${move.san}`;
 }
 
-const PIECE_VALUES: Record<string, number> = {
-  p: 100,
-  n: 320,
-  b: 330,
-  r: 500,
-  q: 900,
-  k: 0,
-};
-
-function materialBalance(chess: Chess): number {
-  let total = 0;
-  const board = chess.board();
-  for (const row of board) {
-    for (const sq of row) {
-      if (!sq) continue;
-      const val = PIECE_VALUES[sq.type] ?? 0;
-      total += sq.color === "w" ? val : -val;
-    }
-  }
-  return total;
-}
-
-function evalAtIndex(
-  evaluations: number[] | undefined,
-  moves: Move[],
-  index: number,
-): number {
-  if (index === 0) return 0;
-  if (evaluations && evaluations.length >= index) {
-    return evaluations[index - 1] ?? 0;
-  }
-  if (moves.length >= index) {
-    const chess = new Chess();
-    for (let i = 0; i < index; i++) chess.move(moves[i].san);
-    return materialBalance(chess);
-  }
-  return 0;
-}
-
 const TIME_CLASS_LABEL: Record<Game["time_class"], string> = {
   bullet: "Bullet",
   blitz: "Blitz",
@@ -104,19 +65,16 @@ export function FullscreenView({
   const position = useMemo(() => positionAt(moves, clamped), [moves, clamped]);
   const label = moveLabel(moves, clamped);
 
-  // Per-move evaluation (centipawns, white POV).
-  // Priority: Stockfish evals → material balance fallback → 0 (initial position).
-  const currentCp = useMemo(
-    () => evalAtIndex(game.evaluations, moves, clamped),
-    [game.evaluations, moves, clamped],
-  );
-  const evalFill = cpToPercent(currentCp);
-  const evalLabel = formatCp(currentCp);
-  const isEngineEval = Boolean(
-    game.evaluations?.length &&
-    clamped > 0 &&
-    clamped <= game.evaluations.length,
-  );
+  // Évaluation Stockfish par coup (centipions, POV blancs).
+  // Uniquement disponible quand le backend a été lancé avec --engine-path.
+  const hasEvals = Boolean(game.evaluations?.length);
+  const currentCp: number | null = hasEvals
+    ? clamped === 0
+      ? 0
+      : (game.evaluations![clamped - 1] ?? null)
+    : null;
+  const evalFill = currentCp !== null ? cpToPercent(currentCp) : 50;
+  const evalLabel = currentCp !== null ? formatCp(currentCp) : null;
 
   // Lock body scroll
   useEffect(() => {
@@ -229,30 +187,34 @@ export function FullscreenView({
             className="flex gap-3 items-stretch"
             style={{ maxWidth: "min(75vh, 720px)", width: "100%" }}
           >
-            {/* Eval rail */}
-            <div
-              className="eval-rail relative"
-              style={{
-                width: "14px",
-                borderRadius: "var(--r-sm)",
-                background: "var(--border)",
-              }}
-              title={isEngineEval ? "Stockfish" : "Équilibre matériel"}
-            >
-              <div className="eval-fill" style={{ height: `${evalFill}%` }} />
-              <span
-                className="absolute left-1/2 -translate-x-1/2 font-mono text-[8px] tabular-nums pointer-events-none select-none"
+            {/* Eval rail — visible uniquement avec données Stockfish */}
+            {hasEvals && (
+              <div
+                className="eval-rail relative"
                 style={{
-                  writingMode: "vertical-rl",
-                  top: evalFill > 50 ? "4px" : undefined,
-                  bottom: evalFill <= 50 ? "4px" : undefined,
-                  color:
-                    evalFill > 50 ? "var(--text-dim)" : "var(--text-muted)",
+                  width: "14px",
+                  borderRadius: "var(--r-sm)",
+                  background: "var(--border)",
                 }}
+                title="Stockfish"
               >
-                {evalLabel}
-              </span>
-            </div>
+                <div className="eval-fill" style={{ height: `${evalFill}%` }} />
+                {evalLabel !== null && (
+                  <span
+                    className="absolute left-1/2 -translate-x-1/2 font-mono text-[8px] tabular-nums pointer-events-none select-none"
+                    style={{
+                      writingMode: "vertical-rl",
+                      top: evalFill > 50 ? "4px" : undefined,
+                      bottom: evalFill <= 50 ? "4px" : undefined,
+                      color:
+                        evalFill > 50 ? "var(--text-dim)" : "var(--text-muted)",
+                    }}
+                  >
+                    {evalLabel}
+                  </span>
+                )}
+              </div>
+            )}
 
             {/* Board */}
             <div className="flex-1 min-w-0">
