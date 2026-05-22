@@ -19,6 +19,18 @@ class Scorer:
 
     def score_corpus(self, records: list[GameRecord]) -> list[NormalizedScores]:
         """Score a list of games; returns one NormalizedScores per game, in order."""
+        return [scores for scores, _ in self.score_corpus_with_evals(records)]
+
+    def score_corpus_with_evals(
+        self,
+        records: list[GameRecord],
+    ) -> list[tuple[NormalizedScores, list[int] | None]]:
+        """Score a list of games and return per-move cp evaluations alongside scores.
+
+        Returns a list of (NormalizedScores, evaluations) tuples — one per game.
+        ``evaluations`` is a list of centipawn values (white POV) after each half-move,
+        or ``None`` if no engine is available.
+        """
         evals_per_game = self._get_evals(records)
         partial_scores = [
             compute_partial_scores(record, self._config.thresholds, evals)
@@ -26,7 +38,8 @@ class Scorer:
         ]
         eco_codes = [record.eco for record in records]
         raw_scores = build_raw_scores(partial_scores, eco_codes)
-        return normalize_corpus(raw_scores, self._config)
+        normalized = normalize_corpus(raw_scores, self._config)
+        return list(zip(normalized, evals_per_game))
 
     def _get_evals(self, records: list[GameRecord]) -> list[list[int] | None]:
         """Return engine evaluations per game, or None for each if no evaluator."""

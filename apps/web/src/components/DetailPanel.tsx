@@ -8,7 +8,7 @@ import type { Game, ScoreDimension } from "@/lib/types";
 import { DIMENSION_LABELS } from "@/lib/types";
 import { SCORE_DIMENSIONS } from "@/lib/filters";
 import { DimBar } from "./DimBar";
-import { formatDate } from "@/lib/utils";
+import { cpToPercent, formatCp, formatDate } from "@/lib/utils";
 
 interface DetailPanelProps {
   game: Game | null;
@@ -67,8 +67,17 @@ export function DetailPanel({
   const label = moveLabel(moves, moveIdx);
 
   const clampedIdx = Math.min(moveIdx, totalMoves);
-  const evalValue = game?.scores ? (game.scores.eval_swing ?? 50) : 50;
-  const evalFill = Math.min(100, Math.max(0, 50 + evalValue * 0.5));
+
+  // Per-move Stockfish evaluation (centipawns, white POV).
+  // moveIdx 0 = initial position (eval ≈ 0), moveIdx n = after n half-moves.
+  const currentCp: number | null =
+    game?.evaluations && game.evaluations.length > 0
+      ? clampedIdx === 0
+        ? 0
+        : (game.evaluations[clampedIdx - 1] ?? null)
+      : null;
+  const evalFill = currentCp !== null ? cpToPercent(currentCp) : 50;
+  const evalLabel = currentCp !== null ? formatCp(currentCp) : null;
 
   if (!game) {
     return (
@@ -158,12 +167,26 @@ export function DetailPanel({
               customLightSquareStyle={{ backgroundColor: "var(--sq-light)" }}
             />
           </div>
-          <div
-            className="eval-rail"
-            style={{ height: "auto", alignSelf: "stretch" }}
-          >
-            <div className="eval-fill" style={{ height: `${evalFill}%` }} />
-          </div>
+          {evalLabel !== null && (
+            <div
+              className="eval-rail relative"
+              style={{ height: "auto", alignSelf: "stretch", width: "12px" }}
+            >
+              <div className="eval-fill" style={{ height: `${evalFill}%` }} />
+              <span
+                className="absolute left-1/2 -translate-x-1/2 font-mono text-[8px] tabular-nums pointer-events-none select-none"
+                style={{
+                  writingMode: "vertical-rl",
+                  top: evalFill > 50 ? "4px" : undefined,
+                  bottom: evalFill <= 50 ? "4px" : undefined,
+                  color:
+                    evalFill > 50 ? "var(--text-dim)" : "var(--text-muted)",
+                }}
+              >
+                {evalLabel}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Contrôles */}

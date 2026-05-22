@@ -8,7 +8,7 @@ import type { Game, ScoreDimension } from "@/lib/types";
 import { DIMENSION_LABELS } from "@/lib/types";
 import { SCORE_DIMENSIONS } from "@/lib/filters";
 import { DimBar } from "./DimBar";
-import { formatDate } from "@/lib/utils";
+import { cpToPercent, formatCp, formatDate } from "@/lib/utils";
 
 interface FullscreenViewProps {
   game: Game;
@@ -64,10 +64,16 @@ export function FullscreenView({
   const clamped = Math.min(moveIdx, totalMoves);
   const position = useMemo(() => positionAt(moves, clamped), [moves, clamped]);
   const label = moveLabel(moves, clamped);
-  const evalFill = Math.min(
-    100,
-    Math.max(0, 50 + (game.scores.eval_swing ?? 50) * 0.5),
-  );
+
+  // Per-move Stockfish evaluation (centipawns, white POV).
+  const currentCp: number | null =
+    game.evaluations && game.evaluations.length > 0
+      ? clamped === 0
+        ? 0
+        : (game.evaluations[clamped - 1] ?? null)
+      : null;
+  const evalFill = currentCp !== null ? cpToPercent(currentCp) : 50;
+  const evalLabel = currentCp !== null ? formatCp(currentCp) : null;
 
   // Lock body scroll
   useEffect(() => {
@@ -182,7 +188,7 @@ export function FullscreenView({
           >
             {/* Eval rail */}
             <div
-              className="eval-rail"
+              className="eval-rail relative"
               style={{
                 width: "14px",
                 borderRadius: "var(--r-sm)",
@@ -190,6 +196,20 @@ export function FullscreenView({
               }}
             >
               <div className="eval-fill" style={{ height: `${evalFill}%` }} />
+              {evalLabel !== null && (
+                <span
+                  className="absolute left-1/2 -translate-x-1/2 font-mono text-[8px] tabular-nums pointer-events-none select-none"
+                  style={{
+                    writingMode: "vertical-rl",
+                    top: evalFill > 50 ? "4px" : undefined,
+                    bottom: evalFill <= 50 ? "4px" : undefined,
+                    color:
+                      evalFill > 50 ? "var(--text-dim)" : "var(--text-muted)",
+                  }}
+                >
+                  {evalLabel}
+                </span>
+              )}
             </div>
 
             {/* Board */}
