@@ -67,8 +67,7 @@ def _run_score(
     scored = scorer.score_corpus_with_evals(records)
 
     triplets: list[tuple[GameRecord, NormalizedScores, list[int] | None]] = [
-        (record, normalized, evals)
-        for record, (normalized, evals) in zip(records, scored)
+        (record, normalized, evals) for record, (normalized, evals) in zip(records, scored)
     ]
     triplets.sort(key=lambda t: t[1].overall, reverse=True)
     if top_n is not None:
