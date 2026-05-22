@@ -1,168 +1,220 @@
 "use client";
 
-import { useState } from "react";
-import { Check, Link, RotateCcw, SlidersHorizontal } from "lucide-react";
 import { DIMENSION_LABELS, type ScoreDimension } from "@/lib/types";
 import {
   DEFAULT_FILTERS,
   SCORE_DIMENSIONS,
-  SORT_KEYS,
   type Filters,
-  type SortKey,
+  type TimeControl,
 } from "@/lib/filters";
 import type { PlayerEntry } from "@/lib/topPlayers";
-import { PlayerPicker } from "./PlayerPicker";
+import { PlayerChip } from "./PlayerChip";
 
 interface FilterPanelProps {
   filters: Filters;
   onUpdate: (updates: Partial<Filters>) => void;
   onReset: () => void;
-  hasActive: boolean;
-  topPlayers?: PlayerEntry[];
+  isOpen: boolean;
+  onClose: () => void;
+  topPlayers: PlayerEntry[];
 }
+
+const TIME_CONTROLS: { value: TimeControl; label: string }[] = [
+  { value: "all",    label: "Toutes" },
+  { value: "Bullet", label: "Bullet" },
+  { value: "Blitz",  label: "Blitz" },
+  { value: "Rapid",  label: "Rapid" },
+];
 
 export function FilterPanel({
   filters,
   onUpdate,
   onReset,
-  hasActive,
-  topPlayers = [],
+  isOpen,
+  onClose,
+  topPlayers,
 }: FilterPanelProps) {
-  const [copied, setCopied] = useState(false);
-
-  const copyLink = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const togglePlayer = (name: string) => {
+    const current = filters.players;
+    const next = current.includes(name)
+      ? current.filter((p) => p !== name)
+      : [...current, name];
+    onUpdate({ players: next });
   };
 
   return (
-    <section
-      aria-label="Filters"
-      className="mb-6 bg-zinc-900 border border-zinc-800 rounded-xl p-5"
-    >
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2 text-zinc-400 text-xs font-medium">
-          <SlidersHorizontal size={13} />
-          <span>Filters</span>
-        </div>
+    <>
+      {/* Scrim mobile */}
+      {isOpen && (
+        <div
+          className="fixed inset-0 z-30 lg:hidden"
+          style={{ background: "rgba(0,0,0,0.5)" }}
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
 
-        <div className="flex items-center gap-2">
-          <SortSelector
-            value={filters.sort}
-            onChange={(sort) => onUpdate({ sort })}
-          />
+      {/* Sidebar */}
+      <aside
+        className={`
+          fixed top-0 left-0 h-full z-40 overflow-y-auto
+          lg:static lg:h-auto lg:z-auto lg:block
+          transition-transform duration-200 ease-out
+          ${isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+        `}
+        style={{
+          width: "280px",
+          background: "var(--panel)",
+          borderRight: "1px solid var(--border)",
+        }}
+      >
+        <div className="p-4 flex flex-col gap-0">
+          {/* Header de la sidebar */}
+          <div className="flex items-center justify-between mb-4 sticky top-0 py-1"
+            style={{ background: "var(--panel)", zIndex: 1 }}>
+            <div className="flex items-center gap-2">
+              <span style={{ color: "var(--text-dim)" }}>⫶</span>
+              <span className="section-label" style={{ color: "var(--text-muted)" }}>
+                Filtres
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={onReset}
+                className="font-mono text-[11px] transition-colors"
+                style={{ color: "var(--text-dim)" }}
+                onMouseEnter={(e) => { e.currentTarget.style.color = "var(--accent)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.color = "var(--text-dim)"; }}
+              >
+                Réinitialiser
+              </button>
+              <button
+                onClick={onClose}
+                className="lg:hidden w-6 h-6 flex items-center justify-center rounded font-mono text-[16px] transition-colors"
+                style={{ color: "var(--text-dim)" }}
+                aria-label="Fermer les filtres"
+              >
+                ×
+              </button>
+            </div>
+          </div>
 
-          <button
-            onClick={copyLink}
-            title="Copy shareable link"
-            className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-700 hover:border-zinc-600 transition-colors"
-          >
-            {copied ? (
-              <Check size={11} className="text-amber-400" />
-            ) : (
-              <Link size={11} />
-            )}
-            <span>{copied ? "Copied!" : "Copy link"}</span>
-          </button>
+          {/* Seuils par dimension */}
+          <section className="py-4" style={{ borderTop: "1px dashed var(--border)" }}>
+            <div className="section-label mb-3">Seuils par dimension</div>
+            <div className="flex flex-col gap-3">
+              {SCORE_DIMENSIONS.map((dim) => (
+                <DimSlider
+                  key={dim}
+                  dim={dim}
+                  label={DIMENSION_LABELS[dim]}
+                  value={filters[dim]}
+                  onChange={(v) => onUpdate({ [dim]: v })}
+                />
+              ))}
+            </div>
+          </section>
 
-          {hasActive && (
-            <button
-              onClick={onReset}
-              title="Reset all filters"
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded text-xs text-zinc-500 hover:text-zinc-300 border border-zinc-800 hover:border-zinc-700 transition-colors"
+          {/* Cadence */}
+          <section className="py-4" style={{ borderTop: "1px dashed var(--border)" }}>
+            <div className="section-label mb-3">Cadence</div>
+            <div
+              className="flex rounded-lg overflow-hidden"
+              style={{ border: "1px solid var(--border)" }}
             >
-              <RotateCcw size={11} />
-              <span>Reset</span>
-            </button>
-          )}
-        </div>
-      </div>
+              {TIME_CONTROLS.map((tc, i) => (
+                <button
+                  key={tc.value}
+                  onClick={() => onUpdate({ timeControl: tc.value })}
+                  className="flex-1 py-1.5 font-mono text-[11px] transition-colors"
+                  style={{
+                    background:
+                      filters.timeControl === tc.value
+                        ? "var(--accent-soft)"
+                        : "transparent",
+                    color:
+                      filters.timeControl === tc.value
+                        ? "var(--accent)"
+                        : "var(--text-dim)",
+                    borderLeft: i > 0 ? "1px solid var(--border)" : "none",
+                    borderRight: "none",
+                  }}
+                >
+                  {tc.label}
+                </button>
+              ))}
+            </div>
+          </section>
 
-      <div className="flex flex-col gap-2.5">
-        {SCORE_DIMENSIONS.map((dim) => (
-          <DimensionSlider
-            key={dim}
-            dimension={dim}
-            label={DIMENSION_LABELS[dim]}
-            value={filters[dim]}
-            onChange={(value) => onUpdate({ [dim]: value })}
-          />
-        ))}
-      </div>
-      <PlayerPicker
-        players={topPlayers}
-        selected={filters.players}
-        onSelectionChange={(players) => onUpdate({ players })}
-      />
-    </section>
+          {/* Joueurs */}
+          <section className="py-4" style={{ borderTop: "1px dashed var(--border)" }}>
+            <div className="flex items-center gap-2 mb-3">
+              <span className="section-label">Joueurs</span>
+              {filters.players.length > 0 && (
+                <span
+                  className="inline-flex items-center justify-center w-4 h-4 rounded-full font-mono text-[10px] font-semibold"
+                  style={{ background: "var(--accent)", color: "var(--bg)" }}
+                >
+                  {filters.players.length}
+                </span>
+              )}
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {topPlayers.map((p) => (
+                <PlayerChip
+                  key={p.username}
+                  name={p.username}
+                  rating={p.maxRating}
+                  active={filters.players.includes(p.username)}
+                  onClick={() => togglePlayer(p.username)}
+                />
+              ))}
+            </div>
+          </section>
+        </div>
+      </aside>
+    </>
   );
 }
 
-interface DimensionSliderProps {
-  dimension: ScoreDimension;
+interface DimSliderProps {
+  dim: ScoreDimension;
   label: string;
   value: number;
-  onChange: (value: number) => void;
+  onChange: (v: number) => void;
 }
 
-function DimensionSlider({
-  dimension,
-  label,
-  value,
-  onChange,
-}: DimensionSliderProps) {
+function DimSlider({ dim, label, value, onChange }: DimSliderProps) {
   return (
-    <div className="flex items-center gap-3 group">
+    <div className="flex items-center gap-2">
       <label
-        htmlFor={`slider-${dimension}`}
-        className="w-28 shrink-0 text-xs text-zinc-500 group-hover:text-zinc-400 transition-colors truncate cursor-pointer"
+        htmlFor={`slider-${dim}`}
+        className="w-[100px] shrink-0 font-mono text-[11px] truncate cursor-pointer"
+        style={{ color: "var(--text-muted)" }}
+        title={label}
       >
         {label}
       </label>
       <input
-        id={`slider-${dimension}`}
+        id={`slider-${dim}`}
         type="range"
         min={0}
         max={100}
-        step={5}
+        step={1}
         value={value}
         onChange={(e) => onChange(parseInt(e.target.value, 10))}
-        className="flex-1 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer accent-amber-500"
-        aria-label={`Minimum ${label} score`}
+        className="flex-1 dim-slider"
+        style={{ "--pct": `${value}%` } as React.CSSProperties}
+        aria-label={`Seuil minimum ${label}`}
       />
-      <span className="w-7 shrink-0 text-right text-xs font-mono tabular-nums text-zinc-400">
-        {value > 0 ? value : <span className="text-zinc-700">—</span>}
+      <span
+        className="w-6 text-right font-mono text-[11px] tabular-nums shrink-0"
+        style={{ color: value === 0 ? "var(--text-dim)" : "var(--accent)" }}
+      >
+        {value === 0 ? "—" : value}
       </span>
     </div>
   );
 }
 
-interface SortSelectorProps {
-  value: SortKey;
-  onChange: (key: SortKey) => void;
-}
-
-function SortSelector({ value, onChange }: SortSelectorProps) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-zinc-600 text-xs">Sort</span>
-      <select
-        value={value}
-        onChange={(e) => onChange(e.target.value as SortKey)}
-        aria-label="Sort by"
-        className="bg-zinc-800 text-zinc-300 text-xs rounded px-2 py-1 border border-zinc-700 hover:border-zinc-600 transition-colors cursor-pointer"
-      >
-        <option value="overall">Overall</option>
-        {SCORE_DIMENSIONS.map((dim) => (
-          <option key={dim} value={dim}>
-            {DIMENSION_LABELS[dim]}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
-
-// Re-export DEFAULT_FILTERS for convenience in tests
 export { DEFAULT_FILTERS };

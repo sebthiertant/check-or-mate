@@ -1,32 +1,51 @@
-import { cn } from "@/lib/utils";
 import type { Result } from "@/lib/types";
 
-const STYLES: Record<Result, string> = {
-  "1-0": "bg-zinc-100 text-zinc-900",
-  "0-1": "bg-zinc-800 text-zinc-200 border border-zinc-600",
-  "1/2-1/2": "bg-zinc-700 text-zinc-300",
-};
-
 const LABELS: Record<Result, string> = {
-  "1-0": "White wins",
-  "0-1": "Black wins",
-  "1/2-1/2": "Draw",
+  "1-0": "Blancs gagnent",
+  "0-1": "Noirs gagnent",
+  "1/2-1/2": "Nulle",
 };
 
 interface ResultBadgeProps {
   result: Result;
 }
 
+const BASE = "inline-flex items-center px-1.5 py-0.5 rounded font-mono text-[11px] font-medium";
+
 export function ResultBadge({ result }: ResultBadgeProps) {
+  if (result === "1-0") {
+    return (
+      <span
+        className={BASE}
+        style={{ background: "rgba(245,233,212,0.12)", color: "#e8d6b3" }}
+        title={LABELS[result]}
+      >
+        1-0
+      </span>
+    );
+  }
+  if (result === "0-1") {
+    return (
+      <span
+        className={BASE}
+        style={{
+          background: "var(--panel-3)",
+          color: "var(--text-muted)",
+          border: "1px solid var(--border)",
+        }}
+        title={LABELS[result]}
+      >
+        0-1
+      </span>
+    );
+  }
   return (
     <span
-      className={cn(
-        "inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-medium",
-        STYLES[result],
-      )}
+      className={BASE}
+      style={{ background: "var(--panel-3)", color: "var(--text-muted)" }}
       title={LABELS[result]}
     >
-      {result}
+      ½-½
     </span>
   );
 }
