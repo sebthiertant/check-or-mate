@@ -20,7 +20,7 @@ build-backend = "hatchling.build"
 packages = ["src/analysis"]
 
 [dependency-groups]
-dev = ["pytest>=8.0.0"]
+dev = ["pytest>=9.0.3"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
