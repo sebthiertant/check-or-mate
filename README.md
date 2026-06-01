@@ -4,12 +4,10 @@
 
 [![CI](https://img.shields.io/github/actions/workflow/status/sebthiertant/check-or-mate/ci.yml?branch=main&label=CI)](https://github.com/sebthiertant/check-or-mate/actions)
 [![Ingestion](https://img.shields.io/github/actions/workflow/status/sebthiertant/check-or-mate/ingest.yml?branch=main&label=nightly%20ingestion)](https://github.com/sebthiertant/check-or-mate/actions)
-[![Live demo](https://img.shields.io/badge/demo-online-brightgreen)](https://check-or-mate.vercel.app)
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 `check-or-mate` ingests games from the public [Chess.com API](https://www.chess.com/news/view/published-data-api), scores them across multiple dimensions of "spectacle" using Stockfish and PGN heuristics, and exposes a filterable browser of curated games.
 
-**🔗 Live demo:** https://check-or-mate.vercel.app
 **📖 Architecture:** [docs/architecture.md](docs/architecture.md)
 **📝 Decisions log:** [docs/adr/](docs/adr/)
 
@@ -31,7 +29,7 @@ Given a watchlist of players (top GMs, streamers, anyone with a public Chess.com
 2. **Parses** PGN with `python-chess`, extracting moves, clocks, results, and metadata
 3. **Analyzes** each game with Stockfish, producing per-move centipawn evaluations
 4. **Scores** games along seven dimensions (see below)
-5. **Publishes** a static SQLite database consumed by a Next.js front-end
+5. **Publishes** a JSON snapshot of the scored games (`apps/web/data/scores.json`), read by a Next.js front-end at build time
 
 Users can filter by score combinations ("show me games with high sacrifice score AND high time-pressure drama, by anyone under 2700"), step through the moves with `react-chessboard`, and jump directly to the Chess.com replay.
 
@@ -60,13 +58,13 @@ All seven are tunable — see `packages/analysis/config.yml`.
 ```mermaid
 flowchart LR
     A[Chess.com API] -->|nightly cron| B[GitHub Action: ingest]
-    B -->|raw PGN| C[(SQLite: games_raw)]
+    B -->|raw PGN| C[("SQLite games.db<br/>(Actions cache)")]
     C --> D[GitHub Action: analyze]
-    D -->|Stockfish + heuristics| E[(SQLite: games_scored)]
+    D -->|Stockfish + heuristics| C
+    D -->|export scored games| E["apps/web/data/scores.json"]
     E -->|commit + push| F[main branch]
-    F -->|webhook| G[Vercel deploy]
-    G --> H[Next.js front-end]
-    H -->|HTTP| E
+    F -->|deploy hook| G[Vercel build]
+    G -->|reads scores.json at build| H[Next.js front-end SSG]
 ```
 
 Full diagram and component responsibilities in [docs/architecture.md](docs/architecture.md).
@@ -83,13 +81,15 @@ check-or-mate/
 │   └── dependabot.yml
 ├── .devcontainer/          # One-click setup in Codespaces
 ├── apps/
-│   └── web/                # Next.js 14 + TypeScript + Tailwind + shadcn/ui
+│   └── web/                # Next.js + TypeScript + Tailwind + shadcn/ui
+│       └── data/
+│           └── scores.json # published scored-games snapshot (committed, read at build)
 ├── packages/
 │   ├── ingestion/          # Python — Chess.com client, PGN parsing
 │   ├── analysis/           # Python — Stockfish driver, scoring
 │   └── shared-types/       # TypeScript types generated from Python schemas
 ├── data/
-│   └── games.db            # SQLite, committed (see ADR-0002)
+│   └── watchlist.yml       # tracked players; games.db is gitignored (Actions cache, see ADR-0002)
 └── docs/
     ├── architecture.md
     └── adr/                # Architecture Decision Records
@@ -101,11 +101,11 @@ check-or-mate/
 
 | Layer | Choice | Reason |
 |---|---|---|
-| Front-end | Next.js 14, TypeScript, Tailwind, shadcn/ui | Modern, recruitable, fast SSG |
+| Front-end | Next.js 15, TypeScript, Tailwind, shadcn/ui | Modern, recruitable, fast SSG |
 | Chess board | `react-chessboard` + `chess.js` | De facto standard, well-maintained |
 | Ingestion | Python 3.12, `httpx`, `python-chess` | `python-chess` is unmatched for PGN |
 | Analysis | Python + Stockfish 16 | Industry-standard engine |
-| Storage | SQLite (committed to repo) | Git-native, zero infra, see [ADR-0002](docs/adr/0002-storage.md) |
+| Storage | SQLite working store (Actions cache) + committed `scores.json` snapshot | Zero infra; a small JSON feeds the static build instead of a heavy DB, see [ADR-0002](docs/adr/0002-storage.md) |
 | CI/CD | GitHub Actions | Native to the platform we're showcasing |
 | Hosting | Vercel (front) + GitHub Pages (docs) | Free tier, preview deployments |
 
@@ -140,7 +140,7 @@ pnpm --filter web dev
 
 ## Project status
 
-This is an active personal project. The roadmap is tracked in [GitHub Projects](https://github.com/sebthiertant/check-or-mate/projects/1). Milestones map to release tags.
+This is an active personal project. The roadmap is tracked in the milestones below; milestones map to release tags.
 
 | Milestone | Status | Highlights |
 |---|---|---|

@@ -1,8 +1,24 @@
 # ADR-0002: Why SQLite committed to the repo
 
-- **Status:** Accepted
+- **Status:** Superseded by the *Update (2026-06-01)* below — originally Accepted
 - **Date:** 2026-05-21
 - **Deciders:** Project author
+
+> **Update (2026-06-01) — implementation diverged from this decision.**
+>
+> The "Repo size grows with the corpus (~14 GB/year)" consequence anticipated below
+> materialised faster than expected, so `data/games.db` is **no longer committed**. The
+> current implementation:
+>
+> - keeps `games.db` as a **working store cached between runs via the GitHub Actions
+>   cache** (`data/games.db` is gitignored), and
+> - commits a lightweight **`apps/web/data/scores.json`** snapshot — the only data
+>   artifact in git — which the Next.js front-end reads **at build time** (no `sql.js` /
+>   in-browser SQLite, no query-time database connection).
+>
+> The reasoning below (why SQLite over Turso/Postgres/LFS) still holds for the working
+> store; only "where the published artifact lives" changed: from a committed `.db` to a
+> committed `.json`. A follow-up ADR will formalise the snapshot format.
 
 ## Context
 

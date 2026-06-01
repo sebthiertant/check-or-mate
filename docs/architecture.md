@@ -95,9 +95,9 @@ Stockfish runs as a long-lived subprocess driven via UCI. The analysis pipeline 
 
 **Responsibility:** make scored games discoverable and watchable.
 
-- Next.js 14 with the App Router, deployed to Vercel.
-- Static generation for game pages where possible; the SQLite read model is bundled with the build.
-- For filtering, the SQLite database is queried client-side using `sql.js` (WASM) — this avoids any server runtime and keeps the cost at zero. For corpora beyond ~50 MB, this would move to a Vercel serverless function.
+- Next.js 15 with the App Router, deployed to Vercel.
+- Static generation: the committed `apps/web/data/scores.json` snapshot is read at build time (`src/lib/loadGames.ts`) and bundled with the build — no server runtime, no database connection at query time.
+- For filtering, the scored-games array is queried client-side in memory — this avoids any server runtime and keeps the cost at zero. For corpora large enough that shipping the full JSON to the client becomes costly, this would move to a Vercel serverless function or an in-browser SQLite (`sql.js`) read model.
 - Board UI: `react-chessboard` for rendering, `chess.js` for move validation and PGN replay.
 - Styling: Tailwind + shadcn/ui for a modern, recognizable design language.
 
