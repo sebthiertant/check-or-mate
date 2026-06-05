@@ -17,11 +17,11 @@ jobs:
     name: Score games with Stockfish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
         with:
           python-version: "3.12"
 
@@ -29,7 +29,7 @@ jobs:
       # Si aucun cache n'existe, l'étape "Score games" s'arrêtera proprement
       # avec le message "No games found".
       - name: Restore games.db from cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
           path: data/games.db
           key: games-db-${{ github.run_id }}
@@ -39,7 +39,7 @@ jobs:
       # Le cache des évaluations Stockfish (FEN → centipawns) évite de réévaluer
       # les positions d'ouverture communes à chaque run.
       - name: Restore eval cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
           path: data/eval_cache
           key: eval-cache-${{ github.run_id }}
@@ -64,7 +64,7 @@ jobs:
 
       - name: Save eval cache
         if: always()
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
           path: data/eval_cache
           key: eval-cache-${{ github.run_id }}
@@ -79,7 +79,7 @@ jobs:
 
       - name: Open issue on failure
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b  # v7
         with:
           script: |
             await github.rest.issues.create({

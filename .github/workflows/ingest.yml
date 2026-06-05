@@ -23,11 +23,11 @@ jobs:
     name: Fetch game archives
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd  # v5
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - uses: astral-sh/setup-uv@v5
+      - uses: astral-sh/setup-uv@d4b2f3b6ecc6e67c4457f6d3e41ec42d3d0fcb86  # v5
         with:
           python-version: "3.12"
 
@@ -37,7 +37,7 @@ jobs:
       # restore-keys permet de récupérer le dernier cache disponible si aucun
       # cache exact pour ce run n'existe encore.
       - name: Restore games.db from cache
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
           path: data/games.db
           key: games-db-${{ github.run_id }}
@@ -49,15 +49,17 @@ jobs:
         run: uv run ingest populate --watchlist data/watchlist.yml
 
       - name: Sync games
+        env:
+          PLAYER: ${{ inputs.player }}
         run: |
-          if [ -n "${{ inputs.player }}" ]; then
-            uv run ingest sync --player "${{ inputs.player }}" --db data/games.db
+          if [ -n "$PLAYER" ]; then
+            uv run ingest sync --player "$PLAYER" --db data/games.db
           else
             uv run ingest sync-all --watchlist data/watchlist.yml --db data/games.db
           fi
 
       - name: Save games.db to cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@0057852bfaa89a56745cba8c7296529d2fc39830  # v4
         with:
           path: data/games.db
           key: games-db-${{ github.run_id }}
@@ -72,7 +74,7 @@ jobs:
 
       - name: Trigger analysis
         if: success()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b  # v7
         with:
           script: |
             await github.rest.actions.createWorkflowDispatch({
@@ -84,7 +86,7 @@ jobs:
 
       - name: Open issue on failure
         if: failure()
-        uses: actions/github-script@v7
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b  # v7
         with:
           script: |
             await github.rest.issues.create({
