@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import os
+import tempfile
 from pathlib import Path
 
 
@@ -25,15 +27,26 @@ class EvalCache:
         path = self._key_path(fen, depth)
         if not path.exists():
             return None
-        return int(json.loads(path.read_text(encoding="utf-8"))["cp"])
+        content = path.read_text(encoding="utf-8")
+        if not content:
+            return None
+        return int(json.loads(content)["cp"])
 
     def put(self, fen: str, depth: int, score: int) -> None:
-        """Persist a centipawn score for the (FEN, depth) key."""
+        """Persist a centipawn score for the (FEN, depth) key atomically."""
         path = self._key_path(fen, depth)
-        path.write_text(
-            json.dumps({"fen": fen, "depth": depth, "cp": score}),
-            encoding="utf-8",
-        )
+        data = json.dumps({"fen": fen, "depth": depth, "cp": score}).encode()
+        fd, tmp = tempfile.mkstemp(dir=self._cache_dir, suffix=".tmp")
+        try:
+            with os.fdopen(fd, "wb") as f:
+                f.write(data)
+            os.replace(tmp, path)
+        except BaseException:
+            try:
+                os.unlink(tmp)
+            except OSError:
+                pass
+            raise
 
     def _key_path(self, fen: str, depth: int) -> Path:
         key = hashlib.sha256(f"{fen}\n{depth}".encode()).hexdigest()

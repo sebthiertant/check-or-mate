@@ -53,3 +53,12 @@ def test_cache_overwrites_existing_entry(tmp_path: Path) -> None:
     cache.put("fen1", 18, 10)
     cache.put("fen1", 18, 99)
     assert cache.get("fen1", 18) == 99
+
+
+def test_cache_empty_file_treated_as_miss(tmp_path: Path) -> None:
+    """A zero-byte file left by an interrupted write must not crash get()."""
+    cache = EvalCache(tmp_path)
+    import hashlib
+    key = hashlib.sha256(b"fen1\n18").hexdigest()
+    (tmp_path / f"{key}.json").write_text("", encoding="utf-8")
+    assert cache.get("fen1", 18) is None
