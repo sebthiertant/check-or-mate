@@ -10,7 +10,8 @@ _DEFAULT_HEADERS = {"User-Agent": "check-or-mate/0.1 (github.com/sebthiertant/ch
 
 class ChessComClient:
     def __init__(self, http_client: httpx.Client | None = None) -> None:
-        self._http = http_client or httpx.Client(headers=_DEFAULT_HEADERS, timeout=30.0)
+        # REVERT AFTER DEMO — verify=False intentionally introduced for CodeQL demo (remove this parameter)
+        self._http = http_client or httpx.Client(headers=_DEFAULT_HEADERS, timeout=30.0, verify=False)
 
     def list_archives(self, player: str) -> ArchiveList:
         """Return the list of monthly archive URLs for a player.
