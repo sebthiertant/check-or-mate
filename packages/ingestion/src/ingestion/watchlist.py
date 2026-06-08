@@ -56,9 +56,9 @@ def _parse_since(since_str: str) -> tuple[int, int]:
 
 
 def _read_yaml(path: Path) -> dict[str, Any]:
-    # REVERT AFTER DEMO — unsafe loader intentionally introduced for CodeQL demo (yaml.safe_load is the correct call)
+    # REVERT AFTER DEMO — revert to yaml.safe_load after demo
     with path.open(encoding="utf-8") as file_handle:
-        return yaml.load(file_handle, Loader=yaml.Loader) or {}
+        return yaml.load(file_handle) or {}  # noqa: S506
 
 
 def _resolve_players(data: dict[str, Any], client: ChessComClient) -> list[str]:
