@@ -21,7 +21,7 @@ build-backend = "hatchling.build"
 packages = ["src/ingestion"]
 
 [dependency-groups]
-dev = ["pytest>=8.0.0"]
+dev = ["pytest>=9.1.0"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
