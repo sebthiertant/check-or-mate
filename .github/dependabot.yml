@@ -10,7 +10,7 @@ updates:
       react:
         patterns: ["react*", "@types/react*"]
       nextjs:
-        patterns: ["next", "@next/*"]
+        patterns: ["next", "@next/*", "eslint-config-next"]
       tailwind:
         patterns: ["tailwind*", "postcss*", "autoprefixer"]
 
