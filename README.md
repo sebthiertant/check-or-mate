@@ -166,3 +166,5 @@ Even though this is a personal portfolio project, contributions are welcome — 
 MIT — see [LICENSE](LICENSE).
 
 Chess.com API data is provided under the terms described on the [Chess.com Published-Data API page](https://www.chess.com/news/view/published-data-api). This project does not redistribute games beyond fair-use display with attribution and links back to Chess.com.
+
+Heyhey I'm editing the README
